@@ -1,0 +1,16 @@
+{
+  "cSpell.words": [
+    "Chillout",
+    "CVRPATH",
+    "nstrip",
+    "organise",
+    "CVRMG"
+  ],
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "editor.rulers": [
+    120
+  ],
+  "editor.tabSize": 2,
+  "vscord.enabled": false 
+}

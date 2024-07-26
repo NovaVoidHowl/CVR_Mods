@@ -2,8 +2,6 @@
 *.user
 obj/
 bin/
-FodyWeavers.xsd
-/.vscode
 NStrip.exe
 lib_names
 .ManagedLibs/*.dll
