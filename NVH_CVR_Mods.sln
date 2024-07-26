@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataFeed", "DataFeed\DataFeed.csproj", "{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
