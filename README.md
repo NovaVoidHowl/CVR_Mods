@@ -6,9 +6,9 @@ Welcome to my little collection of mods, feel free to leave bug reports or featu
 
 ## Mods
 
-| Mod name | More Info                       | Latest Version Git | Latest Version CVRMG | Description                                           |
-| -------- | ------------------------------- | ------------------ | -------------------- | ----------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | 0.0.1              | N/A                  | Exposes certain interface values as Avatar parameters |
+| Mod name | More Info                       |     State      | Latest Version Git | Latest Version CVRMG | Description                                           |
+| -------- | ------------------------------- | :------------: | :----------------: | :------------------: | ----------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) | in development |    0.0.1-alpha     |         N/A          | Exposes certain interface values as Avatar parameters |
 
 ---
 
