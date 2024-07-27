@@ -187,13 +187,13 @@ Thanks for your assistance with getting started on Mellon Loader Mods
 
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/NovaVoidHowl/CVRFury.svg?style=plastic
-[contributors-url]: https://github.com/NovaVoidHowl/CVRFury/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/NovaVoidHowl/CVRFury.svg?style=plastic
-[forks-url]: https://github.com/NovaVoidHowl/CVRFury/network/members
-[issues-shield]: https://img.shields.io/github/issues/NovaVoidHowl/CVRFury.svg?style=plastic
-[issues-url]: https://github.com/NovaVoidHowl/CVRFury/issues
+[contributors-shield]: https://img.shields.io/github/contributors/NovaVoidHowl/CVR_Mods.svg?style=plastic
+[contributors-url]: https://github.com/NovaVoidHowl/CVR_Mods/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/NovaVoidHowl/CVR_Mods.svg?style=plastic
+[forks-url]: https://github.com/NovaVoidHowl/CVR_Mods/network/members
+[issues-shield]: https://img.shields.io/github/issues/NovaVoidHowl/CVR_Mods.svg?style=plastic
+[issues-url]: https://github.com/NovaVoidHowl/CVR_Mods/issues
 [license-shield]: https://img.shields.io/badge/License-LGPL_2.1-blue
-[license-url]: https://github.com/NovaVoidHowl/CVRFury/blob/master/LICENSE.md
-[stars-shield]: https://img.shields.io/github/stars/NovaVoidHowl/CVRFury.svg?style=plastic
-[stars-url]: https://github.com/NovaVoidHowl/CVRFury/stargazers
+[license-url]: https://github.com/NovaVoidHowl/CVR_Mods/blob/master/LICENSE.md
+[stars-shield]: https://img.shields.io/github/stars/NovaVoidHowl/CVR_Mods.svg?style=plastic
+[stars-url]: https://github.com/NovaVoidHowl/CVR_Mods/stargazers
