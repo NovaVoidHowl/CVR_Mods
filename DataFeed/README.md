@@ -2,7 +2,7 @@
 
 ## About
 
-This mod enables Provides a Data Feed from ChilloutVR.
+This mod provides a Data Feed of additional parameters from ChilloutVR.
 
 ## Avatar Parameters
 
