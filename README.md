@@ -167,7 +167,7 @@ Project Link: [https://cvr-mods.dev.novavoidhowl.uk](https://cvr-mods.dev.novavo
 
 ## Acknowledgments
 
-### @kafeijao
+### [@kafeijao](https://github.com/kafeijao)
 
 Thanks for your assistance with getting started on Mellon Loader Mods
 
