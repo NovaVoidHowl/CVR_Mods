@@ -79,9 +79,9 @@ feel free to leave bug reports or feature requests!
 
 ## Mods List
 
-| Mod name | More Info                       | State | Latest Version Git | Latest Version CVRMG | Description                                           |
-| -------- | ------------------------------- | :---: | :----------------: | :------------------: | ----------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.3        |         N/A          | Exposes certain interface values as Avatar parameters |
+| Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                           |
+| -------- | ------------------------------- | :---: | :----------------: | :----------------------: | ----------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.3        | 0.0.3 - pending approval | Exposes certain interface values as Avatar parameters |
 
 ---
 <!-- BUILDING -->
