@@ -194,6 +194,6 @@ Thanks for your assistance with getting started on Mellon Loader Mods
 [issues-shield]: https://img.shields.io/github/issues/NovaVoidHowl/CVR_Mods.svg?style=plastic
 [issues-url]: https://github.com/NovaVoidHowl/CVR_Mods/issues
 [license-shield]: https://img.shields.io/badge/License-LGPL_2.1-blue
-[license-url]: https://github.com/NovaVoidHowl/CVR_Mods/blob/master/LICENSE.md
+[license-url]: https://github.com/NovaVoidHowl/CVR_Mods/blob/master/LICENSE
 [stars-shield]: https://img.shields.io/github/stars/NovaVoidHowl/CVR_Mods.svg?style=plastic
 [stars-url]: https://github.com/NovaVoidHowl/CVR_Mods/stargazers
