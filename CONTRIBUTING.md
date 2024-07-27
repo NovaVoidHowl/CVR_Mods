@@ -23,6 +23,8 @@ of X formatting standard is better type requests/comments)
 All indents (C#, yaml etc.) are set to 2 spaces
 All lines (for any file, excluding License files) must not exceed 120 characters in length
 
+Exceptions: Markdown tables are permitted to be over the line length limit
+
 ## Files that are not open to contributions
 
 The following files are used to enforce project standards and are not open to contributions,
