@@ -6,14 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using MelonLoader;
 
-namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
+namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 {
   public class PulsoidClient : IDisposable
   {
     // Base URI for Pulsoid API. This is hardcoded because it is unlikely to change.
-    #pragma warning disable S1075
+#pragma warning disable S1075
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
-    #pragma warning restore S1075
+#pragma warning restore S1075
     private ClientWebSocket _webSocket;
     private CancellationTokenSource _cancellationTokenSource;
     private System.Timers.Timer _heartBeatTimer;
@@ -27,11 +27,18 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
     public int onesHR { get; set; }
     public int tensHR { get; set; }
     public int hundredsHR { get; set; }
+    public event Action OnHeartRateUpdated;
 
     public static async Task<bool> ValidatePulsoidKey(string key)
     {
-      if (string.IsNullOrEmpty(key) || key == "XXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+      if (string.IsNullOrEmpty(key))
       {
+        MelonLogger.Error($"Error validating Pulsoid key: Key value empty.");
+        return false;
+      }
+      if (key == "XXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+      {
+        MelonLogger.Error($"Error validating Pulsoid key: Key set to placeholder value .");
         return false;
       }
 
@@ -128,6 +135,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
 
         // Update the heart beat timer interval based on HR
         _heartBeatTimer.Interval = 60000.0 / HR; // Interval in milliseconds for each beat
+
+        // Notify that heart rate data has been updated
+        OnHeartRateUpdated?.Invoke();
       }
       catch (Exception ex)
       {

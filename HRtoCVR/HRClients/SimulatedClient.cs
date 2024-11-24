@@ -1,7 +1,7 @@
 using System;
 using System.Timers;
 
-namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
+namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 {
   public class SimulatedClient : IDisposable
   {
@@ -17,6 +17,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
     public int onesHR { get; private set; }
     public int tensHR { get; private set; }
     public int hundredsHR { get; private set; }
+    public event Action OnHeartRateUpdated;
 
     public SimulatedClient()
     {
@@ -37,6 +38,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
       isHRConnected = true;
       isHRActive = true;
       isHRBeat = !isHRBeat;
+
+      // Notify that heart rate data has been updated
+      OnHeartRateUpdated?.Invoke();
     }
 
     protected virtual void Dispose(bool disposing)
