@@ -1,4 +1,8 @@
-﻿using ABI_RC.Core.Savior;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Timers;
+using ABI_RC.Core.Savior;
 using ABI_RC.Core.Player;
 using ABI_RC.Systems.GameEventSystem;
 using ABI.CCK.Components;
@@ -33,6 +37,8 @@ public class HRtoCVR : MelonMod
   private bool isHRBeat; // Estimation on when the heart is beating
   private float HRPercent; // Range of HR between the MinHR and MaxHR config value on a scale of 0 to 1
   private int HR; //Returns the raw HR, ranged from 0 - 255. (required)
+
+  private Timer _pollingTimer;
 
   // On Melon Load
   public override void OnInitializeMelon()
@@ -95,7 +101,6 @@ public class HRtoCVR : MelonMod
       MelonLogger.Msg("Pulsoid Key Changed");
     });
 
-
     // Event Listeners CVR, 
     // Note: more of these these can be found in the CVRGameEventSystem class under the
     // ABI_RC.Systems.GameEventSystem namespace if needed
@@ -118,63 +123,55 @@ public class HRtoCVR : MelonMod
       SetAvatarParameters();
     });
 
-
+    InitializePollingTimer();
   }
 
-  #region melon variables update
-
-  private void OnMeEnableChanged(bool oldValue, bool newValue)
+  private void InitializePollingTimer()
   {
-    if(oldValue == newValue)
-    {
-      // no change in value
-      #if DEBUG
-      MelonLogger.Msg("HRtoCVR Enable parameter event triggered, but has not changed.");
-      #endif
-    }
-    else
-    {
-      MelonLogger.Msg("HRtoCVR Enabled: " + newValue);
-      UpdateHRtoCVR();
-      SetAvatarParameters();
-    } 
+    _pollingTimer = new Timer(5000); // Poll every 5 seconds
+    _pollingTimer.Elapsed += async (sender, e) => await PollPulsoidAPI();
+    _pollingTimer.AutoReset = true;
+    _pollingTimer.Enabled = true;
   }
 
-  private void OnMeMinHRSetChanged(int oldValue, int newValue)
+  private async Task PollPulsoidAPI()
   {
-    if(oldValue == newValue)
+    if (!meEnable.Value || string.IsNullOrEmpty(mePulsoidKey.Value))
     {
-      // no change in value
-      #if DEBUG
-      MelonLogger.Msg("Min HR parameter event triggered, but has not changed.");
-      #endif
+      return;
     }
-    else
-    {
-      MelonLogger.Msg("Min HR Changed: " + newValue);
-      UpdateHRtoCVR();
-      SetAvatarParameters();
-    } 
-  }
 
-  private void OnMeMaxHRSetChanged(int oldValue, int newValue)
-  {
-    if(oldValue == newValue)
+    try
     {
-      // no change in value
-      #if DEBUG
-      MelonLogger.Msg("Max HR parameter event triggered, but has not changed.");
-      #endif
+      using (HttpClient client = new HttpClient())
+      {
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {mePulsoidKey.Value}");
+        HttpResponseMessage response = await client.GetAsync("https://dev.pulsoid.net/v1/data/heart_rate/latest");
+        response.EnsureSuccessStatusCode();
+        string responseBody = await response.Content.ReadAsStringAsync();
+
+        // Parse the response and update HR variables
+        dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+        HR = (int)data.data.heart_rate;
+        onesHR = HR % 10;
+        tensHR = (HR / 10) % 10;
+        hundredsHR = (HR / 100) % 10;
+        HRPercent = (float)(HR - meMinHR.Value) / (meMaxHR.Value - meMinHR.Value);
+        isHRConnected = true;
+        isHRActive = true;
+        isHRBeat = true; // This would need a more accurate calculation
+
+        SetAvatarParameters();
+      }
     }
-    else
+    catch (Exception ex)
     {
-      MelonLogger.Msg("Max HR Changed: " + newValue);
-      UpdateHRtoCVR();
-      SetAvatarParameters();
-    } 
+      MelonLogger.Error($"Error polling Pulsoid API: {ex.Message}");
+      isHRConnected = false;
+      isHRActive = false;
+      isHRBeat = false;
+    }
   }
-
-  #endregion melon variables update
 
   private void UpdateHRtoCVR()
   {
@@ -217,5 +214,7 @@ public class HRtoCVR : MelonMod
   public override void OnApplicationQuit()
   {
     // any on quit code here, ie closing connections etc
+    _pollingTimer?.Stop();
+    _pollingTimer?.Dispose();
   }
 }
