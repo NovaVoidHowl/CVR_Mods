@@ -1,7 +1,7 @@
 <Project>
 
     <PropertyGroup>
-        <!-- Put your Chillout vr path in a new environnment variable CVRPATH in Windows -->
+        <!-- Put your Chillout vr path in a new environment variable CVRPATH in Windows -->
         <OutputPath>$(CVRPATH)\Mods\</OutputPath>
         <LangVersion>latest</LangVersion>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
