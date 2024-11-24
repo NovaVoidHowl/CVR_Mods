@@ -12,6 +12,7 @@ using ABI.CCK.Components;
 using ABI_RC.Systems.Movement;
 using MelonLoader;
 using Microsoft.CSharp.RuntimeBinder;
+using uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients;
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR;
 
@@ -27,6 +28,7 @@ public class HRtoCVR : MelonMod
 
   // Core Mellon Loader Vars
   public MelonPreferences_Entry<bool> meEnable;
+  public MelonPreferences_Entry<bool> meVerboseLogging;
   public MelonPreferences_Entry<int> meMinHR;
   public MelonPreferences_Entry<int> meMaxHR;
   public MelonPreferences_Entry<HRConnectionType> meHRType;
@@ -47,6 +49,11 @@ public class HRtoCVR : MelonMod
       "Enable",
       true,
       description: "Enables or Disables the data feed, note values will default to true when disabled."
+    );
+    meVerboseLogging = melonCategoryHRtoCVR.CreateEntry(
+      "Verbose Logging",
+      false,
+      description: "Enables or Disables verbose logging."
     );
     meMinHR = melonCategoryHRtoCVR.CreateEntry("Min HR", 0, description: "Minimum Heart Rate Value.");
     meMaxHR = melonCategoryHRtoCVR.CreateEntry("Max HR", 255, description: "Maximum Heart Rate Value.");
@@ -76,6 +83,12 @@ public class HRtoCVR : MelonMod
           MelonLogger.Msg("HRtoCVR Enabled");
         }
         UpdateHRtoCVR();
+      }
+    );
+    meVerboseLogging.OnEntryValueChanged.Subscribe(
+      (oldValue, newValue) =>
+      {
+        MelonLogger.Msg("Verbose Logging Changed: " + newValue);
       }
     );
     meMinHR.OnEntryValueChanged.Subscribe(
@@ -148,10 +161,12 @@ public class HRtoCVR : MelonMod
       case HRConnectionType.Pulsoid:
         _pulsoidClient = new PulsoidClient();
         _pulsoidClient.InitializeHeartBeatTimer();
+        _pulsoidClient.OnHeartRateUpdated += SetMainAvatarParameters;
         _ = _pulsoidClient.InitializeWebSocket(mePulsoidKey.Value, meMinHR.Value, meMaxHR.Value);
         break;
       case HRConnectionType.Simulated:
         _simulatedClient = new SimulatedClient();
+        _simulatedClient.OnHeartRateUpdated += SetMainAvatarParameters;
         break;
       default:
         MelonLogger.Error("Unknown HRConnectionType.");
@@ -246,38 +261,49 @@ public class HRtoCVR : MelonMod
     }
   }
 
-  private void SetMainAvatarParameters()
+  private void VerbosePrintMainAvatarParameters()
   {
-    // all this function does is batch set the parameters to the animator
-    PlayerSetup.Instance.animatorManager.SetParameter("HRtoCVRDisabled", HRtoCVRDisabled);
-
+    // check if verbose logging is enabled
+    if (!meVerboseLogging.Value)
+    {
+      return;
+    }
+    // all this function does is batch print the parameters to the melon logger
     switch (meHRType.Value)
     {
       case HRConnectionType.Pulsoid:
         if (_pulsoidClient != null)
         {
-          PlayerSetup.Instance.animatorManager.SetParameter("onesHR", _pulsoidClient.onesHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("tensHR", _pulsoidClient.tensHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("hundredsHR", _pulsoidClient.hundredsHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("isHRConnected", _pulsoidClient.isHRConnected);
-          PlayerSetup.Instance.animatorManager.SetParameter("isHRActive", _pulsoidClient.isHRActive);
-          PlayerSetup.Instance.animatorManager.SetParameter("HRPercent", _pulsoidClient.HRPercent);
-          PlayerSetup.Instance.animatorManager.SetParameter("HR", _pulsoidClient.HR);
+          MelonLogger.Msg("onesHR: " + _pulsoidClient.onesHR);
+          MelonLogger.Msg("tensHR: " + _pulsoidClient.tensHR);
+          MelonLogger.Msg("hundredsHR: " + _pulsoidClient.hundredsHR);
+          MelonLogger.Msg("isHRConnected: " + _pulsoidClient.isHRConnected);
+          MelonLogger.Msg("isHRActive: " + _pulsoidClient.isHRActive);
+          MelonLogger.Msg("HRPercent: " + _pulsoidClient.HRPercent);
+          MelonLogger.Msg("HR: " + _pulsoidClient.HR);
         }
         break;
       case HRConnectionType.Simulated:
         if (_simulatedClient != null)
         {
-          PlayerSetup.Instance.animatorManager.SetParameter("onesHR", _simulatedClient.onesHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("tensHR", _simulatedClient.tensHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("hundredsHR", _simulatedClient.hundredsHR);
-          PlayerSetup.Instance.animatorManager.SetParameter("isHRConnected", _simulatedClient.isHRConnected);
-          PlayerSetup.Instance.animatorManager.SetParameter("isHRActive", _simulatedClient.isHRActive);
-          PlayerSetup.Instance.animatorManager.SetParameter("HRPercent", _simulatedClient.HRPercent);
-          PlayerSetup.Instance.animatorManager.SetParameter("HR", _simulatedClient.HR);
+          MelonLogger.Msg("onesHR: " + _simulatedClient.onesHR);
+          MelonLogger.Msg("tensHR: " + _simulatedClient.tensHR);
+          MelonLogger.Msg("hundredsHR: " + _simulatedClient.hundredsHR);
+          MelonLogger.Msg("isHRConnected: " + _simulatedClient.isHRConnected);
+          MelonLogger.Msg("isHRActive: " + _simulatedClient.isHRActive);
+          MelonLogger.Msg("HRPercent: " + _simulatedClient.HRPercent);
+          MelonLogger.Msg("HR: " + _simulatedClient.HR);
         }
         break;
     }
+  }
+
+  private void SetMainAvatarParameters()
+  {
+    // print the parameters to the melon logger if verbose logging is enabled
+    VerbosePrintMainAvatarParameters();
+    // set the parameters using AvatarParameterSetter
+    AvatarParameterSetter.SetParameters(HRtoCVRDisabled, _pulsoidClient, _simulatedClient, meHRType.Value);
   }
 
   public override void OnApplicationQuit()
