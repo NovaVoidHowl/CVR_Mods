@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataFeed", "DataFeed\DataFeed.csproj", "{81E84FD7-1C2F-48C2-B28F-B5045BDD0380}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HCtoCVR", "HRtoCVR\HCtoCVR.csproj", "{BA6C0685-DE14-4C08-8C94-398E4802CA08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRtoCVR", "HRtoCVR\HRtoCVR.csproj", "{BA6C0685-DE14-4C08-8C94-398E4802CA08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
