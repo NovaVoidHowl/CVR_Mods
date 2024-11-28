@@ -17,7 +17,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
 #pragma warning restore S1075
     private const string PulsoidKeyValidationPath = "/token/validate";
-    public const string PulsoidClientVersion = "0.1.4";
+    public const string PulsoidClientVersion = "0.1.5";
 
     private const int HRDataTimeout = 4000; // 4 seconds with no HR data will reset values and mark as not active
     private ClientWebSocket _webSocket;
@@ -431,7 +431,32 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       OnHeartRateUpdated?.Invoke();
     }
 
-    protected virtual async Task DisposeAsync(bool disposing)
+    public void Dispose()
+    {
+      Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+      if (!_disposed)
+      {
+        if (disposing)
+        {
+          _heartBeatTimer?.Stop();
+          _heartBeatTimer?.Dispose();
+          _messageTimeoutTimer?.Stop();
+          _messageTimeoutTimer?.Dispose();
+          _cancellationTokenSource?.Cancel();
+          _cancellationTokenSource?.Dispose();
+          _webSocket?.Dispose();
+          ResetHRValuesToDefault();
+        }
+
+        _disposed = true;
+      }
+    }
+
+    protected virtual async ValueTask DisposeAsync(bool disposing)
     {
       if (!_disposed)
       {
@@ -455,33 +480,6 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
     public async ValueTask DisposeAsync()
     {
       await DisposeAsync(true);
-      GC.SuppressFinalize(this);
-    }
-
-    public void Dispose()
-    {
-      Dispose(true);
-      GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-      if (!_disposed)
-      {
-        if (disposing)
-        {
-          _heartBeatTimer?.Stop();
-          _heartBeatTimer?.Dispose();
-          _messageTimeoutTimer?.Stop();
-          _messageTimeoutTimer?.Dispose();
-          _cancellationTokenSource?.Cancel();
-          _cancellationTokenSource?.Dispose();
-          _webSocket?.Dispose();
-          ResetHRValuesToDefault();
-        }
-
-        _disposed = true;
-      }
     }
 
     ~PulsoidClient()
