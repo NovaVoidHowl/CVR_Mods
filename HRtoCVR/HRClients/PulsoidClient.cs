@@ -17,7 +17,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
 #pragma warning restore S1075
     private const string PulsoidKeyValidationPath = "/token/validate";
-    public const string PulsoidClientVersion = "0.1.1";
+    public const string PulsoidClientVersion = "0.1.2";
 
     private const int HRDataTimeout = 4000; // 4 seconds with no HR data will reset values and mark as not active
     private ClientWebSocket _webSocket;
@@ -150,7 +150,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       try
       {
         PulsoidResponse jsonResponse = JsonConvert.DeserializeObject<PulsoidResponse>(responseContent);
+#if DEBUG
         string clientId = jsonResponse.client_id;
+#endif
         int expiresIn = jsonResponse.expires_in;
 
         // Convert expires_in to DateTime
