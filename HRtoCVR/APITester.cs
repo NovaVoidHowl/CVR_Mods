@@ -6,7 +6,9 @@ using MelonLoader;
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
 {
+#pragma warning disable S101
   public static class APITester
+#pragma warning restore S101
   {
     public static async Task<bool> IsApiReachable(
       string baseUri,
