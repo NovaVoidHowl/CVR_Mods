@@ -27,8 +27,10 @@ public class HRtoCVR : MelonMod
     TextFile
   }
 
-  public const string CoreVersion = "0.1.2";
+  public const string CoreVersion = "0.1.3";
 
+// Melon Loader vars should stay public
+#pragma warning disable S1104
   // Core Mellon Loader Vars
   public MelonPreferences_Entry<bool> meEnable;
   public MelonPreferences_Entry<bool> meVerboseLogging;
@@ -42,7 +44,8 @@ public class HRtoCVR : MelonMod
 
   // Text File Specific Mellon Loader Vars
   public MelonPreferences_Entry<string> meTextFileLocation;
-  public MelonPreferences_Entry<int> meTextFilePollingRate; 
+  public MelonPreferences_Entry<int> meTextFilePollingRate;
+#pragma warning restore S1104
 
   // Values to be fed
   private bool HRtoCVRDisabled; // Returns whether the mod's data feed is disabled or not
