@@ -10,14 +10,14 @@ using System.Timers;
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 {
-  public class PulsoidClient : IDisposable, IAsyncDisposable
+  public class PulsoidClient : IDisposable
   {
     // Base URI for Pulsoid API. This is hardcoded because it is unlikely to change.
 #pragma warning disable S1075
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
 #pragma warning restore S1075
     private const string PulsoidKeyValidationPath = "/token/validate";
-    public const string PulsoidClientVersion = "0.1.5";
+    public const string PulsoidClientVersion = "0.1.6";
 
     private const int HRDataTimeout = 4000; // 4 seconds with no HR data will reset values and mark as not active
     private ClientWebSocket _webSocket;
@@ -150,9 +150,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       try
       {
         PulsoidResponse jsonResponse = JsonConvert.DeserializeObject<PulsoidResponse>(responseContent);
-#if DEBUG
         string clientId = jsonResponse.client_id;
-#endif
         int expiresIn = jsonResponse.expires_in;
 
         // Convert expires_in to DateTime
@@ -431,66 +429,38 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       OnHeartRateUpdated?.Invoke();
     }
 
-    public void Dispose()
-    {
-      Dispose(disposing: true);
-      GC.SuppressFinalize(this);
-    }
-
     protected virtual void Dispose(bool disposing)
     {
       if (!_disposed)
       {
         if (disposing)
         {
-          // Dispose managed resources
           _heartBeatTimer?.Stop();
           _heartBeatTimer?.Dispose();
           _messageTimeoutTimer?.Stop();
           _messageTimeoutTimer?.Dispose();
+#pragma warning disable S6966
+          // there is no such thing as CancelAsync for CancellationTokenSource
           _cancellationTokenSource?.Cancel();
+#pragma warning restore S6966
           _cancellationTokenSource?.Dispose();
+          CloseWebSocketAsync().GetAwaiter().GetResult();
           _webSocket?.Dispose();
+          ResetHRValuesToDefault();
         }
-
-        // Dispose unmanaged resources (if any)
 
         _disposed = true;
       }
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-      await DisposeAsync(disposing: true);
+      Dispose(true);
       GC.SuppressFinalize(this);
     }
-
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-      if (!_disposed)
-      {
-        if (disposing)
-        {
-          // Dispose managed resources
-          _heartBeatTimer?.Stop();
-          _heartBeatTimer?.Dispose();
-          _messageTimeoutTimer?.Stop();
-          _messageTimeoutTimer?.Dispose();
-          _cancellationTokenSource?.Cancel();
-          _cancellationTokenSource?.Dispose();
-          await CloseWebSocketAsync();
-          _webSocket?.Dispose();
-        }
-
-        // Dispose unmanaged resources (if any)
-
-        _disposed = true;
-      }
-    }
-
     ~PulsoidClient()
     {
-      Dispose(disposing: false);
+      Dispose(false);
     }
   }
 
