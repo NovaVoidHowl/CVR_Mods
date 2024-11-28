@@ -150,7 +150,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       try
       {
         PulsoidResponse jsonResponse = JsonConvert.DeserializeObject<PulsoidResponse>(responseContent);
+#if DEBUG
         string clientId = jsonResponse.client_id;
+#endif
         int expiresIn = jsonResponse.expires_in;
 
         // Convert expires_in to DateTime
