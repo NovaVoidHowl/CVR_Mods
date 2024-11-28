@@ -17,7 +17,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
 #pragma warning restore S1075
     private const string PulsoidKeyValidationPath = "/token/validate";
-    public const string PulsoidClientVersion = "0.1.0";
+    public const string PulsoidClientVersion = "0.1.1";
 
     private const int HRDataTimeout = 4000; // 4 seconds with no HR data will reset values and mark as not active
     private ClientWebSocket _webSocket;
@@ -47,7 +47,10 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 
       try
       {
+        // Check if the Valve.Newtonsoft.Json library is loaded/available, note test is meant to be an unused variable
+#pragma warning disable S1481
         var test = Valve.Newtonsoft.Json.JsonConvert.SerializeObject(new { test = "test" });
+#pragma warning restore S1481
         if (!noOKLog)
         {
           MelonLogger.Msg("Valve.Newtonsoft.Json library loaded successfully.");
