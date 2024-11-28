@@ -60,6 +60,7 @@
 </details>
 
 <!-- ABOUT -->
+
 ## About
 
 Welcome to my little collection of mods for [ChilloutVR](https://abinteractive.net/),
@@ -79,12 +80,15 @@ feel free to leave bug reports or feature requests!
 
 ## Mods List
 
-| Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                           |
-| -------- | ------------------------------- | :---: | :----------------: | :----------------------: | ----------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.3        | 0.0.3 - pending approval | Exposes certain interface values as Avatar parameters |
+| Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                              |
+| -------- | ------------------------------- | :---: | :----------------: | :----------------------: | -------------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.4        | 0.0.4 - pending approval | Exposes certain interface values as Avatar parameters    |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.14       |     pending approval     | Provides Heart Rate values as avatar animator parameters |
 
 ---
+
 <!-- BUILDING -->
+
 ## Building
 
 In order to build the mods in this project:

@@ -1,12 +1,12 @@
 {
   "_id": "UNKNOWN",
   "name": "DataFeed",
-  "modversion": "0.1.1",
+  "modversion": "0.1.14",
   "gameversion": "2024r177",
   "loaderversion": "v0.6.4",
   "modtype": "Mod",
   "author": "NovaVoidHowl",
-  "description": "This mod provides Heart Rate values as avatar animator parameters",
+  "description": "This mod provides Heart Rate values as avatar animator parameters, please see source link for more information.",
   "searchtags": [
     "animator",
     "parameter"
