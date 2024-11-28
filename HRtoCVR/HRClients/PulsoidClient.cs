@@ -17,7 +17,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
     private const string PulsoidBaseUri = "https://dev.pulsoid.net/api/v1";
 #pragma warning restore S1075
     private const string PulsoidKeyValidationPath = "/token/validate";
-    public const string PulsoidClientVersion = "0.1.3";
+    public const string PulsoidClientVersion = "0.1.4";
 
     private const int HRDataTimeout = 4000; // 4 seconds with no HR data will reset values and mark as not active
     private ClientWebSocket _webSocket;
@@ -452,6 +452,12 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       }
     }
 
+    public async ValueTask DisposeAsync()
+    {
+      await DisposeAsync(true);
+      GC.SuppressFinalize(this);
+    }
+
     public void Dispose()
     {
       Dispose(true);
@@ -464,14 +470,15 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       {
         if (disposing)
         {
-          // Dispose managed resources
-          _webSocket?.Dispose();
-          _cancellationTokenSource?.Dispose();
+          _heartBeatTimer?.Stop();
           _heartBeatTimer?.Dispose();
+          _messageTimeoutTimer?.Stop();
           _messageTimeoutTimer?.Dispose();
+          _cancellationTokenSource?.Cancel();
+          _cancellationTokenSource?.Dispose();
+          _webSocket?.Dispose();
+          ResetHRValuesToDefault();
         }
-
-        // Dispose unmanaged resources
 
         _disposed = true;
       }
