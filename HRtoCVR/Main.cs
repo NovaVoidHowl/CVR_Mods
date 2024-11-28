@@ -23,25 +23,46 @@ public class HRtoCVR : MelonMod
   public enum HRConnectionType
   {
     Pulsoid,
-    Simulated
+    Simulated,
+    TextFile
   }
+
+  public const string CoreVersion = "0.1.0";
 
   // Core Mellon Loader Vars
   public MelonPreferences_Entry<bool> meEnable;
   public MelonPreferences_Entry<bool> meVerboseLogging;
+  public MelonPreferences_Entry<bool> meVerboseParametersLogging;
   public MelonPreferences_Entry<int> meMinHR;
   public MelonPreferences_Entry<int> meMaxHR;
   public MelonPreferences_Entry<HRConnectionType> meHRType;
+
+  // Pulsoid Specific Mellon Loader Vars
   public MelonPreferences_Entry<string> mePulsoidKey;
+
+  // 
+  public MelonPreferences_Entry<string> meTextFileLocation;
+  public MelonPreferences_Entry<int> meTextFilePollingRate; 
 
   // Values to be fed
   private bool HRtoCVRDisabled; // Returns whether the mod's data feed is disabled or not
   private PulsoidClient _pulsoidClient;
   private SimulatedClient _simulatedClient;
+  private TextFileClient _textFileClient;
+
+  // private internal logic variables
+  private List<IDisposable> activeClients = new List<IDisposable>();
 
   // On Melon Load
   public override void OnInitializeMelon()
   {
+#if DEBUG
+    MelonLogger.Error(
+      "This mod was compiled in DEBUG mode log spam possible and API keys may be visible in logs,"
+        + " do not use in production environment"
+    );
+#endif
+
     // Melon Config
     var melonCategoryHRtoCVR = MelonPreferences.CreateCategory(nameof(HRtoCVR));
     // Core Mod Options
@@ -55,6 +76,11 @@ public class HRtoCVR : MelonMod
       false,
       description: "Enables or Disables verbose logging."
     );
+    meVerboseParametersLogging = melonCategoryHRtoCVR.CreateEntry(
+      "Verbose Parameters Logging",
+      false,
+      description: "Enables or Disables verbose logging of the avatar parameter feed values."
+    );
     meMinHR = melonCategoryHRtoCVR.CreateEntry("Min HR", 0, description: "Minimum Heart Rate Value.");
     meMaxHR = melonCategoryHRtoCVR.CreateEntry("Max HR", 255, description: "Maximum Heart Rate Value.");
     meHRType = melonCategoryHRtoCVR.CreateEntry(
@@ -62,10 +88,25 @@ public class HRtoCVR : MelonMod
       HRConnectionType.Pulsoid,
       description: "Type of connection type to use."
     );
+
+    // Pulsoid Specific Options
     mePulsoidKey = melonCategoryHRtoCVR.CreateEntry(
       "Pulsoid Key",
       "XXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
-      description: "Pulsoid Key for the data feed."
+      description: "Pulsoid Key for the data feed.",
+      is_hidden: true // Hide the key from the UI its an API key and should not be visible
+    );
+
+    // text file Specific Options
+    meTextFileLocation = melonCategoryHRtoCVR.CreateEntry(
+      "Text File Location",
+      "C:\\path\\to\\file.txt",
+      description: "Location of the text file to read from."
+    );
+    meTextFilePollingRate = melonCategoryHRtoCVR.CreateEntry(
+      "HR File Polling Rate",
+      10,
+      description: "the rate in seconds at which the file should be read"
     );
 
     // Event Listeners MelonLoader
@@ -73,14 +114,14 @@ public class HRtoCVR : MelonMod
       (oldValue, newValue) =>
       {
         OnMeEnableChanged(oldValue, newValue);
-        // Log the values to the melon logger
         if (HRtoCVRDisabled)
         {
-          MelonLogger.Msg("HRtoCVR Disabled");
+          DisposeCurrentClients();
+          SetMainAvatarParameters(true);
         }
         else
         {
-          MelonLogger.Msg("HRtoCVR Enabled");
+          InitializeHRClient();
         }
         UpdateHRtoCVR();
       }
@@ -89,6 +130,17 @@ public class HRtoCVR : MelonMod
       (oldValue, newValue) =>
       {
         MelonLogger.Msg("Verbose Logging Changed: " + newValue);
+        if (meEnable.Value)
+        {
+          // needed here to change the logging level the client is initialized with
+          InitializeHRClient();
+        }
+      }
+    );
+    meVerboseParametersLogging.OnEntryValueChanged.Subscribe(
+      (oldValue, newValue) =>
+      {
+        MelonLogger.Msg("Verbose Parameters Logging Changed: " + newValue);
       }
     );
     meMinHR.OnEntryValueChanged.Subscribe(
@@ -109,13 +161,43 @@ public class HRtoCVR : MelonMod
       (oldValue, newValue) =>
       {
         MelonLogger.Msg("HR Type Changed: " + newValue);
-        InitializeHRClient();
+        if (meEnable.Value)
+        {
+          InitializeHRClient();
+        }
       }
     );
+    // Pulsoid Specific Event Listeners
     mePulsoidKey.OnEntryValueChanged.Subscribe(
       (oldValue, newValue) =>
       {
         MelonLogger.Msg("Pulsoid Key Changed");
+        if (meEnable.Value)
+        {
+          InitializeHRClient();
+        }
+      }
+    );
+
+    // Text File Specific Event Listeners
+    meTextFileLocation.OnEntryValueChanged.Subscribe(
+      (oldValue, newValue) =>
+      {
+        MelonLogger.Msg("HR Text File Path Changed");
+        if (meEnable.Value)
+        {
+          InitializeHRClient();
+        }
+      }
+    );
+    meTextFilePollingRate.OnEntryValueChanged.Subscribe(
+      (oldValue, newValue) =>
+      {
+        MelonLogger.Msg("HR Text File Polling Rate Changed");
+        if (meEnable.Value)
+        {
+          InitializeHRClient();
+        }
       }
     );
 
@@ -125,6 +207,10 @@ public class HRtoCVR : MelonMod
 
     CVRGameEventSystem.Initialization.OnPlayerSetupStart.AddListener(() =>
     {
+      if (!meEnable.Value)
+      {
+        return;
+      }
       MelonLogger.Msg("Player Setup Start");
       UpdateHRtoCVR();
     });
@@ -132,7 +218,12 @@ public class HRtoCVR : MelonMod
     CVRGameEventSystem.Instance.OnConnected.AddListener(
       (string message) =>
       {
-        MelonLogger.Msg("On Instance Load: " + message);
+        if (!meEnable.Value)
+        {
+          return;
+        }
+        MelonLogger.Msg("Instance `" + message + "` Connected, reloading HRtoCVR data source.");
+        InitializeHRClient();
         UpdateHRtoCVR();
         SetMainAvatarParameters();
       }
@@ -141,6 +232,10 @@ public class HRtoCVR : MelonMod
     CVRGameEventSystem.Avatar.OnLocalAvatarLoad.AddListener(
       (CVRAvatar avatar) =>
       {
+        if (!meEnable.Value)
+        {
+          return;
+        }
         // get the game object of the avatar
         MelonLogger.Msg("On Local Avatar Load: " + avatar.gameObject.name);
         UpdateHRtoCVR();
@@ -148,25 +243,47 @@ public class HRtoCVR : MelonMod
       }
     );
 
-    InitializeHRClient();
+    if (meEnable.Value)
+    {
+      InitializeHRClient();
+    }
   }
+
+  private void ResetHRValues() { }
 
   private void InitializeHRClient()
   {
-    // Dispose of any existing client
-    DisposeCurrentClient();
-
+    // Dispose of any existing clients
+    DisposeCurrentClients();
+  
     switch (meHRType.Value)
     {
       case HRConnectionType.Pulsoid:
-        _pulsoidClient = new PulsoidClient();
+        _pulsoidClient = new PulsoidClient
+        {
+          verboseLogging = meVerboseLogging.Value // Set the verbose logging flag
+        };
         _pulsoidClient.InitializeHeartBeatTimer();
-        _pulsoidClient.OnHeartRateUpdated += SetMainAvatarParameters;
+        _pulsoidClient.OnHeartRateUpdated += OnHeartRateUpdatedHandler;
+        _pulsoidClient.OnHeartRateRapidUpdated += OnHeartRateRapidUpdatedHandler;
         _ = _pulsoidClient.InitializeWebSocket(mePulsoidKey.Value, meMinHR.Value, meMaxHR.Value);
+        activeClients.Add(_pulsoidClient); // Add to the list of active clients
         break;
       case HRConnectionType.Simulated:
         _simulatedClient = new SimulatedClient();
-        _simulatedClient.OnHeartRateUpdated += SetMainAvatarParameters;
+        _simulatedClient.InitializeHeartBeatTimer();
+        _simulatedClient.InitializeClient(meMinHR.Value, meMaxHR.Value);
+        _simulatedClient.OnHeartRateUpdated += OnHeartRateUpdatedHandler;
+        _simulatedClient.OnHeartRateRapidUpdated += OnHeartRateRapidUpdatedHandler;
+        activeClients.Add(_simulatedClient); // Add to the list of active clients
+        break;
+      case HRConnectionType.TextFile:
+        _textFileClient = new TextFileClient(meTextFileLocation.Value, meTextFilePollingRate.Value);
+        _textFileClient.InitializeHeartBeatTimer();
+        _textFileClient.InitializeClient(meMinHR.Value, meMaxHR.Value);
+        _textFileClient.OnHeartRateUpdated += OnHeartRateUpdatedHandler;
+        _textFileClient.OnHeartRateRapidUpdated += OnHeartRateRapidUpdatedHandler;
+        activeClients.Add(_textFileClient); // Add to the list of active clients
         break;
       default:
         MelonLogger.Error("Unknown HRConnectionType.");
@@ -174,19 +291,13 @@ public class HRtoCVR : MelonMod
     }
   }
 
-  private void DisposeCurrentClient()
+  private void DisposeCurrentClients()
   {
-    switch (meHRType.Value)
+    foreach (var client in activeClients)
     {
-      case HRConnectionType.Pulsoid:
-        _pulsoidClient?.Dispose();
-        _pulsoidClient = null;
-        break;
-      case HRConnectionType.Simulated:
-        _simulatedClient?.Dispose();
-        _simulatedClient = null;
-        break;
+      client.Dispose();
     }
+    activeClients.Clear();
   }
 
   #region melon variables update
@@ -222,6 +333,7 @@ public class HRtoCVR : MelonMod
       MelonLogger.Msg("Min HR Changed: " + newValue);
       UpdateHRtoCVR();
       SetMainAvatarParameters();
+      InitializeHRClient();
     }
   }
 
@@ -239,6 +351,7 @@ public class HRtoCVR : MelonMod
       MelonLogger.Msg("Max HR Changed: " + newValue);
       UpdateHRtoCVR();
       SetMainAvatarParameters();
+      InitializeHRClient();
     }
   }
 
@@ -251,7 +364,7 @@ public class HRtoCVR : MelonMod
     {
       // if disabled, set all values to defaults
       HRtoCVRDisabled = true;
-      DisposeCurrentClient();
+      DisposeCurrentClients();
     }
     else
     {
@@ -264,7 +377,7 @@ public class HRtoCVR : MelonMod
   private void VerbosePrintMainAvatarParameters()
   {
     // check if verbose logging is enabled
-    if (!meVerboseLogging.Value)
+    if (!meVerboseParametersLogging.Value)
     {
       return;
     }
@@ -295,19 +408,59 @@ public class HRtoCVR : MelonMod
           MelonLogger.Msg("HR: " + _simulatedClient.HR);
         }
         break;
+
+      case HRConnectionType.TextFile:
+        if (_textFileClient != null)
+        {
+          MelonLogger.Msg("onesHR: " + _textFileClient.onesHR);
+          MelonLogger.Msg("tensHR: " + _textFileClient.tensHR);
+          MelonLogger.Msg("hundredsHR: " + _textFileClient.hundredsHR);
+          MelonLogger.Msg("isHRConnected: " + _textFileClient.isHRConnected);
+          MelonLogger.Msg("isHRActive: " + _textFileClient.isHRActive);
+          MelonLogger.Msg("HRPercent: " + _textFileClient.HRPercent);
+          MelonLogger.Msg("HR: " + _textFileClient.HR);
+        }
+        break;
     }
   }
 
-  private void SetMainAvatarParameters()
+  private void OnHeartRateUpdatedHandler()
+  {
+    SetMainAvatarParameters();
+  }
+
+  private void OnHeartRateRapidUpdatedHandler()
+  {
+    SetRapidUpdateParameters();
+  }
+
+  private void SetRapidUpdateParameters()
+  {
+    AvatarParameterSetter.SetRapidUpdateParameters(
+      _pulsoidClient,
+      _simulatedClient,
+      _textFileClient,
+      meHRType.Value
+    );
+  }
+
+  private void SetMainAvatarParameters(bool resetToDefault = false)
   {
     // print the parameters to the melon logger if verbose logging is enabled
     VerbosePrintMainAvatarParameters();
     // set the parameters using AvatarParameterSetter
-    AvatarParameterSetter.SetParameters(HRtoCVRDisabled, _pulsoidClient, _simulatedClient, meHRType.Value);
+    AvatarParameterSetter.SetMainParameters(
+      HRtoCVRDisabled,
+      _pulsoidClient,
+      _simulatedClient,
+      _textFileClient,
+      meHRType.Value,
+      resetToDefault
+    );
   }
 
   public override void OnApplicationQuit()
   {
-    DisposeCurrentClient();
+    DisposeCurrentClients();
   }
 }
