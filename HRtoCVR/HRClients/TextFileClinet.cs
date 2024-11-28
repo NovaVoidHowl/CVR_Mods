@@ -7,7 +7,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 {
   public class TextFileClient : IDisposable
   {
-    public const string TextFileClientVersion = "0.1.0";
+    public const string TextFileClientVersion = "0.1.1";
     private readonly System.Timers.Timer _pollingTimer;
     private System.Timers.Timer _heartBeatTimer;
     private bool _disposed = false;
@@ -48,18 +48,28 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 
     private void ReadHeartRateFromFile()
     {
+#if DEBUG
       MelonLogger.Msg("Attempting to read heart rate from file: " + _filePath);
+#endif
       try
       {
+#if DEBUG
         MelonLogger.Msg("Checking if file exists at path: " + _filePath);
+#endif
         bool fileExists = File.Exists(_filePath);
+#if DEBUG
         MelonLogger.Msg("File exists: " + fileExists);
+#endif
 
         if (fileExists)
         {
+#if DEBUG
           MelonLogger.Msg("File found at path: " + _filePath);
+#endif
           var fileContent = File.ReadAllText(_filePath);
+#if DEBUG
           MelonLogger.Msg("File content read: " + fileContent);
+#endif
           if (int.TryParse(fileContent, out int hr))
           {
             HR = hr;
