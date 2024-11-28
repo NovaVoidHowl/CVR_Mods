@@ -27,7 +27,7 @@ public class HRtoCVR : MelonMod
     TextFile
   }
 
-  public const string CoreVersion = "0.1.3";
+  public const string CoreVersion = "0.1.4";
 
 // Melon Loader vars should stay public
 #pragma warning disable S1104
@@ -54,7 +54,7 @@ public class HRtoCVR : MelonMod
   private TextFileClient _textFileClient;
 
   // private internal logic variables
-  private List<IDisposable> activeClients = new List<IDisposable>();
+  private readonly List<IDisposable> activeClients = new List<IDisposable>();
 
   // On Melon Load
   public override void OnInitializeMelon()
