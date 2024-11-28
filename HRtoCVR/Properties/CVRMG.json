@@ -1,8 +1,8 @@
 {
   "_id": "UNKNOWN",
   "name": "DataFeed",
-  "modversion": "0.0.1",
-  "gameversion": "2024r176",
+  "modversion": "0.1.0",
+  "gameversion": "2024r177",
   "loaderversion": "v0.6.4",
   "modtype": "Mod",
   "author": "NovaVoidHowl",
