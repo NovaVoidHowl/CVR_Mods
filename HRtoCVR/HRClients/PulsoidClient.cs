@@ -10,7 +10,7 @@ using System.Timers;
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 {
-  public class PulsoidClient : IDisposable
+  public class PulsoidClient : IDisposable, IAsyncDisposable
   {
     // Base URI for Pulsoid API. This is hardcoded because it is unlikely to change.
 #pragma warning disable S1075
@@ -433,7 +433,8 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
 
     public void Dispose()
     {
-      Dispose(true);
+      Dispose(disposing: true);
+      GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -442,6 +443,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       {
         if (disposing)
         {
+          // Dispose managed resources
           _heartBeatTimer?.Stop();
           _heartBeatTimer?.Dispose();
           _messageTimeoutTimer?.Stop();
@@ -449,11 +451,18 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
           _cancellationTokenSource?.Cancel();
           _cancellationTokenSource?.Dispose();
           _webSocket?.Dispose();
-          ResetHRValuesToDefault();
         }
+
+        // Dispose unmanaged resources (if any)
 
         _disposed = true;
       }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+      await DisposeAsync(disposing: true);
+      GC.SuppressFinalize(this);
     }
 
     protected virtual async ValueTask DisposeAsync(bool disposing)
@@ -462,6 +471,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       {
         if (disposing)
         {
+          // Dispose managed resources
           _heartBeatTimer?.Stop();
           _heartBeatTimer?.Dispose();
           _messageTimeoutTimer?.Stop();
@@ -470,21 +480,17 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
           _cancellationTokenSource?.Dispose();
           await CloseWebSocketAsync();
           _webSocket?.Dispose();
-          ResetHRValuesToDefault();
         }
+
+        // Dispose unmanaged resources (if any)
 
         _disposed = true;
       }
     }
 
-    public async ValueTask DisposeAsync()
-    {
-      await DisposeAsync(true);
-    }
-
     ~PulsoidClient()
     {
-      Dispose(false);
+      Dispose(disposing: false);
     }
   }
 
