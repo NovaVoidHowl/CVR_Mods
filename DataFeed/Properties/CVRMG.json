@@ -1,19 +1,19 @@
 {
   "_id": 227,
   "name": "DataFeed",
-  "modversion": "0.0.3",
-  "gameversion": "2024r176",
+  "modversion": "0.0.4",
+  "gameversion": "2024r177",
   "loaderversion": "v0.6.4",
   "modtype": "Mod",
   "author": "NovaVoidHowl",
-  "description": "This mod provides a Data Feed of additional parameters from ChilloutVR.",
+  "description": "This mod provides a Data Feed of additional parameters from ChilloutVR, please see source link for more information.",
   "searchtags": [
     "animator",
     "parameter"
   ],
   "requirements": [],
-  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r1/DataFeed.dll",
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r2/DataFeed.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
-  "changelog": "Initial Release",
+  "changelog": "Recompile for 2024r177",
   "embedcolor": "FFBC00"
 }
