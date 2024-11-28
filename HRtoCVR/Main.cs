@@ -27,7 +27,7 @@ public class HRtoCVR : MelonMod
     TextFile
   }
 
-  public const string CoreVersion = "0.1.1";
+  public const string CoreVersion = "0.1.2";
 
   // Core Mellon Loader Vars
   public MelonPreferences_Entry<bool> meEnable;
@@ -40,7 +40,7 @@ public class HRtoCVR : MelonMod
   // Pulsoid Specific Mellon Loader Vars
   public MelonPreferences_Entry<string> mePulsoidKey;
 
-  // 
+  // Text File Specific Mellon Loader Vars
   public MelonPreferences_Entry<string> meTextFileLocation;
   public MelonPreferences_Entry<int> meTextFilePollingRate; 
 
