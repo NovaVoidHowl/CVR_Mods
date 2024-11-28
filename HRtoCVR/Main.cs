@@ -27,7 +27,7 @@ public class HRtoCVR : MelonMod
     TextFile
   }
 
-  public const string CoreVersion = "0.1.0";
+  public const string CoreVersion = "0.1.1";
 
   // Core Mellon Loader Vars
   public MelonPreferences_Entry<bool> meEnable;
@@ -248,8 +248,6 @@ public class HRtoCVR : MelonMod
       InitializeHRClient();
     }
   }
-
-  private void ResetHRValues() { }
 
   private void InitializeHRClient()
   {
