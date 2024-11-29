@@ -1,7 +1,7 @@
 {
   "_id": 227,
   "name": "DataFeed",
-  "modversion": "0.0.4",
+  "modversion": "0.0.5",
   "gameversion": "2024r177",
   "loaderversion": "v0.6.4",
   "modtype": "Mod",
@@ -12,7 +12,7 @@
     "parameter"
   ],
   "requirements": [],
-  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r2/DataFeed.dll",
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/DataFeed.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
   "changelog": "Recompile for 2024r177",
   "embedcolor": "FFBC00"
