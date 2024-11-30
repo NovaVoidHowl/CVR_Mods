@@ -21,7 +21,7 @@
 <br />
 <div align="center">
 
-<h3 align="center">NovaVoidHowls's CVR Mods</h3>
+<h3 align="center">NovaVoidHowl's CVR Mods</h3>
 
 <p align="center">
     <br />
@@ -80,10 +80,11 @@ feel free to leave bug reports or feature requests!
 
 ## Mods List
 
-| Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                              |
-| -------- | ------------------------------- | :---: | :----------------: | :----------------------: | -------------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.4        | 0.0.4 - pending approval | Exposes certain interface values as Avatar parameters    |
-| HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.14       |     pending approval     | Provides Heart Rate values as avatar animator parameters |
+| Mod name | More Info                       |   State    | Latest Version Git |   Latest Version CVRMG   | Description                                                     |
+| -------- | ------------------------------- | :--------: | :----------------: | :----------------------: | --------------------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.0.6        | 0.0.4 - pending approval | Exposes certain interface values as Avatar parameters           |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.15       | 0.1.14 - pending approval     | Provides Heart Rate values as avatar animator parameters        |
+| THtoCVR  | [README.md](THtoCVR/README.md)  | PreRelease |       0.0.1        |           N/A            | Temperature and/or humidity sensor info to avatar animator parameters. |
 
 ---
 
