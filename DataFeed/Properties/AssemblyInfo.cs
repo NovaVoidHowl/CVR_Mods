@@ -26,7 +26,7 @@ using MelonLoader;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Properties;
 internal static class AssemblyInfoParams {
-    public const string Version = "0.0.5";
+    public const string Version = "0.0.6";
     public const string Author = "NovaVoidHowl";
     public const string CVRParamLibName = "CVRParamLib";
 }
