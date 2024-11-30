@@ -2,7 +2,7 @@
 
 ## About
 
-This mod provides a Hart Rate info to avatar animator parameters.
+This mod provides a Heart Rate info to avatar animator parameters.
 
 ## Avatar Parameters
 
@@ -35,7 +35,7 @@ heart rate hardware
 ### TextFile
 
 This Client reads its input heart rate from a text file at the polling rate configured, note you need to have a text
-file at the path defined in the mod config that just contains the rate you want to use nothing else 
+file at the path defined in the mod config that just contains the rate you want to use nothing else
 (ie no new lines at the end of the file)
 
 ### Pulsoid

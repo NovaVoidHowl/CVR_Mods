@@ -5,115 +5,125 @@ using ABI.CCK.Components;
 using ABI_RC.Systems.Movement;
 using MelonLoader;
 
-namespace uk.novavoidhowl.dev.cvrmods.DataFeed;
-
-public class DataFeed : MelonMod
+namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 {
-  private MelonPreferences_Category _MelonCategoryDataFeed;
-
-  // Core Mellon Loader Vars
-  public MelonPreferences_Entry<bool> meEnable;
-  public MelonPreferences_Entry<bool> meAvatarParamSetEnabled;
-
-  // Values to be fed
-  private bool flyingAllowed;
-  private bool propsAllowed;
-  private bool portalsAllowed;
-  private bool nameplatesEnabled;
-
-  private bool dataFeedErrorBBCC;
-  private bool dataFeedErrorMetaPort;
-  private bool dataFeedDisabled;
-
-  // On Melon Load
-  public override void OnInitializeMelon()
+  public class DataFeed : MelonMod
   {
-    // Melon Config
-    _MelonCategoryDataFeed = MelonPreferences.CreateCategory(nameof(DataFeed));
-    // Core Mod Options
-    meEnable = _MelonCategoryDataFeed.CreateEntry(
-      "Enable",
-      true,
-      description: "Enables or Disables the data feed, note values will default to true when disabled ."
-    );
-    meAvatarParamSetEnabled = _MelonCategoryDataFeed.CreateEntry(
-      "Avatar Parameter Output Enabled",
-      true,
-      description: "Enables or Disables setting of Avatar Parameters."
-    );
+    // Melon Loader vars should stay public
+#pragma warning disable S1104
+    // Core Mellon Loader Vars
+    public MelonPreferences_Entry<bool> meEnable;
+    public MelonPreferences_Entry<bool> meAvatarParamSetEnabled;
+#pragma warning restore S1104
 
+    // Values to be fed
+    private bool flyingAllowed;
+    private bool propsAllowed;
+    private bool portalsAllowed;
+    private bool nameplatesEnabled;
 
-    // Event Listeners MelonLoader
-    meEnable.OnEntryValueChanged.Subscribe((oldValue, newValue) => {
-      OnMeEnableChanged(oldValue, newValue); 
-    });
-    meAvatarParamSetEnabled.OnEntryValueChanged.Subscribe((oldValue, newValue) => {
-      OnMeAvatarParamSetEnabledChanged(oldValue, newValue); 
-    });
+    private bool dataFeedErrorBBCC;
+    private bool dataFeedErrorMetaPort;
+    private bool dataFeedDisabled;
 
-    // Event Listeners CVR, 
-    // Note: more of these these can be found in the CVRGameEventSystem class under the
-    // ABI_RC.Systems.GameEventSystem namespace if needed
-
-    CVRGameEventSystem.Initialization.OnPlayerSetupStart.AddListener(() => {
-      MelonLogger.Msg("Player Setup Start");
-      UpdateDataFeed();
-    });
-
-    CVRGameEventSystem.Instance.OnConnected.AddListener((string message) => {
-      MelonLogger.Msg("On Instance Load: " + message);
-      UpdateDataFeed();
-      PrintCurrentDataFeedValues();
-      SetAvatarParameters();
-    });
-
-    CVRGameEventSystem.Avatar.OnLocalAvatarLoad.AddListener((CVRAvatar avatar) => {
-      // get the game object of the avatar
-      MelonLogger.Msg("On Local Avatar Load: " + avatar.gameObject.name);
-      UpdateDataFeed();
-      PrintCurrentDataFeedValues();
-      SetAvatarParameters();
-    });
-
-
-  }
-
-  private void OnMeEnableChanged(bool oldValue, bool newValue)
-  {
-    if(oldValue == newValue)
+    // On Melon Load
+    public override void OnInitializeMelon()
     {
-      // no change in value
-      #if DEBUG
-      MelonLogger.Msg("Data Feed Enable parameter event triggered, but has not changed.");
-      #endif
+      // Melon Config
+      var _MelonCategoryDataFeed = MelonPreferences.CreateCategory(nameof(DataFeed));
+      meEnable = _MelonCategoryDataFeed.CreateEntry(
+        "Enable",
+        true,
+        description: "Enables or Disables the data feed, note values will default to true when disabled ."
+      );
+      meAvatarParamSetEnabled = _MelonCategoryDataFeed.CreateEntry(
+        "Avatar Parameter Output Enabled",
+        true,
+        description: "Enables or Disables setting of Avatar Parameters."
+      );
+
+      // Event Listeners MelonLoader
+      meEnable.OnEntryValueChanged.Subscribe(
+        (oldValue, newValue) =>
+        {
+          OnMeEnableChanged(oldValue, newValue);
+        }
+      );
+      meAvatarParamSetEnabled.OnEntryValueChanged.Subscribe(
+        (oldValue, newValue) =>
+        {
+          OnMeAvatarParamSetEnabledChanged(oldValue, newValue);
+        }
+      );
+
+      // Event Listeners CVR,
+      // Note: more of these these can be found in the CVRGameEventSystem class under the
+      // ABI_RC.Systems.GameEventSystem namespace if needed
+
+      CVRGameEventSystem.Initialization.OnPlayerSetupStart.AddListener(() =>
+      {
+        MelonLogger.Msg("Player Setup Start");
+        UpdateDataFeed();
+      });
+
+      CVRGameEventSystem.Instance.OnConnected.AddListener(
+        (string message) =>
+        {
+          MelonLogger.Msg("On Instance Load: " + message);
+          UpdateDataFeed();
+          PrintCurrentDataFeedValues();
+          SetAvatarParameters();
+        }
+      );
+
+      CVRGameEventSystem.Avatar.OnLocalAvatarLoad.AddListener(
+        (CVRAvatar avatar) =>
+        {
+          // get the game object of the avatar
+          MelonLogger.Msg("On Local Avatar Load: " + avatar.gameObject.name);
+          UpdateDataFeed();
+          PrintCurrentDataFeedValues();
+          SetAvatarParameters();
+        }
+      );
     }
-    else
-    {
-      MelonLogger.Msg("Data Feed Enabled: " + newValue);
-      UpdateDataFeed();
-      SetAvatarParameters();
-    } 
-  }
 
-  private void OnMeAvatarParamSetEnabledChanged(bool oldValue, bool newValue)
-  {
-    if(oldValue == newValue)
+    private void OnMeEnableChanged(bool oldValue, bool newValue)
     {
-      // no change in value
-      #if DEBUG
-      MelonLogger.Msg("Avatar Parameter Output Enabled parameter event triggered, but has not changed.");
-      #endif
+      if (oldValue == newValue)
+      {
+        // no change in value
+#if DEBUG
+        MelonLogger.Msg("Data Feed Enable parameter event triggered, but has not changed.");
+#endif
+      }
+      else
+      {
+        MelonLogger.Msg("Data Feed Enabled: " + newValue);
+        UpdateDataFeed();
+        SetAvatarParameters();
+      }
     }
-    else
-    {
-      MelonLogger.Msg("Avatar Parameter Output Enabled: " + newValue);
-      UpdateDataFeed();
-      SetAvatarParameters();
-    } 
-  }
 
-  private void UpdateDataFeed()
-  {
+    private void OnMeAvatarParamSetEnabledChanged(bool oldValue, bool newValue)
+    {
+      if (oldValue == newValue)
+      {
+        // no change in value
+#if DEBUG
+        MelonLogger.Msg("Avatar Parameter Output Enabled parameter event triggered, but has not changed.");
+#endif
+      }
+      else
+      {
+        MelonLogger.Msg("Avatar Parameter Output Enabled: " + newValue);
+        UpdateDataFeed();
+        SetAvatarParameters();
+      }
+    }
+
+    private void UpdateDataFeed()
+    {
       // check if the mod is enabled
       if (!meEnable.Value)
       {
@@ -155,49 +165,46 @@ public class DataFeed : MelonMod
           dataFeedErrorMetaPort = false;
         }
       }
-
-  }
-
-  private void SetAvatarParameters()
-  {
-    // check if the mod is enabled
-    if (!meEnable.Value || !meAvatarParamSetEnabled.Value)
-    {
-      // Feed disabled
-      // main data feed
-      PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", true);
-      PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", true);
-      PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", true);
-      PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", true);
-
-      // mod status data feed
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", false);
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", false);
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", true);
-
-      MelonLogger.Msg("Avatar Data Feed Disabled, Parameters set to default.");
     }
-    else
+
+    private void SetAvatarParameters()
     {
-      // main data feed
-      PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", flyingAllowed);
-      PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", propsAllowed);
-      PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", portalsAllowed);
-      PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", nameplatesEnabled);
+      // check if the mod is enabled
+      if (!meEnable.Value || !meAvatarParamSetEnabled.Value)
+      {
+        // Feed disabled
+        // main data feed
+        PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", true);
+        PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", true);
+        PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", true);
+        PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", true);
 
-      // mod status data feed
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", dataFeedErrorBBCC);
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", dataFeedErrorMetaPort);
-      PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", dataFeedDisabled);
+        // mod status data feed
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", false);
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", false);
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", true);
 
-      MelonLogger.Msg("Avatar Parameters Set.");
+        MelonLogger.Msg("Avatar Data Feed Disabled, Parameters set to default.");
+      }
+      else
+      {
+        // main data feed
+        PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", flyingAllowed);
+        PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", propsAllowed);
+        PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", portalsAllowed);
+        PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", nameplatesEnabled);
+
+        // mod status data feed
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", dataFeedErrorBBCC);
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", dataFeedErrorMetaPort);
+        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", dataFeedDisabled);
+
+        MelonLogger.Msg("Avatar Parameters Set.");
+      }
     }
-  }
 
-
-  private void PrintCurrentDataFeedValues()
-  {
-
+    private void PrintCurrentDataFeedValues()
+    {
       // Log the values to the melon logger
       MelonLogger.Msg("Data Feed:");
       MelonLogger.Msg("FlyingAllowed: " + flyingAllowed);
@@ -208,10 +215,11 @@ public class DataFeed : MelonMod
       MelonLogger.Msg("BBCC Error: " + dataFeedErrorBBCC);
       MelonLogger.Msg("MetaPort Error: " + dataFeedErrorMetaPort);
       MelonLogger.Msg("Data Feed Disabled: " + dataFeedDisabled);
-  }
+    }
 
-  public override void OnApplicationQuit()
-  {
-    // any on quit code here, ie closing connections etc
+    public override void OnApplicationQuit()
+    {
+      // any on quit code here, ie closing connections etc
+    }
   }
 }
