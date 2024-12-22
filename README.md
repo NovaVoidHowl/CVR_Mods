@@ -82,8 +82,8 @@ feel free to leave bug reports or feature requests!
 
 | Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                              |
 | -------- | ------------------------------- | :---: | :----------------: | :----------------------: | -------------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.4        | 0.0.4 - pending approval | Exposes certain interface values as Avatar parameters    |
-| HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.14       |     pending approval     | Provides Heart Rate values as avatar animator parameters |
+| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.4        |           0.0.4          | Exposes certain interface values as Avatar parameters    |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.14       |          0.1.14          | Provides Heart Rate values as avatar animator parameters |
 
 ---
 
