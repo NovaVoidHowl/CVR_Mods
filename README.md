@@ -76,14 +76,11 @@
 Welcome to my little collection of mods for [ChilloutVR](https://abinteractive.net/),
 feel free to leave bug reports or feature requests!
 
-> ---
+> [!NOTE]
 >
-> ⚠️ **Notice!** ⚠️
+> ⚠️ This project is an independent creation and is not affiliated with, supported by, or approved by Alpha Blend
+> Interactive ⚠️
 >
-> This project is an independent creation and is not affiliated with, supported by, or approved by Alpha Blend
-> Interactive
->
-> ---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- MOD LIST -->
@@ -92,8 +89,8 @@ feel free to leave bug reports or feature requests!
 
 | Mod name | More Info                       |   State    | Latest Version Git |   Latest Version CVRMG   | Description                                                     |
 | -------- | ------------------------------- | :--------: | :----------------: | :----------------------: | --------------------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.0.6        | 0.0.4 - pending approval | Exposes certain interface values as Avatar parameters           |
-| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.15       | 0.1.14 - pending approval     | Provides Heart Rate values as avatar animator parameters        |
+| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.0.6        |           0.0.4          | Exposes certain interface values as Avatar parameters           |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.15       |          0.1.14          | Provides Heart Rate values as avatar animator parameters        |
 | THtoCVR  | [README.md](THtoCVR/README.md)  | PreRelease |       0.0.1        |           N/A            | Temperature and/or humidity sensor info to avatar animator parameters. |
 
 ---
