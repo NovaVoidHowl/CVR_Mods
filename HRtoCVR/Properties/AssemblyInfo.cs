@@ -10,11 +10,11 @@ using MelonLoader;
 [assembly: AssemblyProduct(nameof(uk.novavoidhowl.dev.cvrmods.HRtoCVR))]
 
 [assembly: MelonInfo(
-    typeof(uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRtoCVR),
-    nameof(uk.novavoidhowl.dev.cvrmods.HRtoCVR),
-    AssemblyInfoParams.Version,
-    AssemblyInfoParams.Author,
-    downloadLink: "https://github.com/NovaVoidHowl/CVR_Mods"
+  typeof(uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRtoCVR),
+  nameof(uk.novavoidhowl.dev.cvrmods.HRtoCVR),
+  AssemblyInfoParams.Version,
+  AssemblyInfoParams.Author,
+  downloadLink: "https://github.com/NovaVoidHowl/CVR_Mods"
 )]
 [assembly: MelonGame("Alpha Blend Interactive", "ChilloutVR")]
 [assembly: MelonPlatform(MelonPlatformAttribute.CompatiblePlatforms.WINDOWS_X64)]
@@ -25,8 +25,10 @@ using MelonLoader;
 [assembly: MelonIncompatibleAssemblies(AssemblyInfoParams.CVRParamLibName)]
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.Properties;
-internal static class AssemblyInfoParams {
-    public const string Version = "0.1.15";
-    public const string Author = "NovaVoidHowl";
-    public const string CVRParamLibName = "CVRParamLib";
+
+internal static class AssemblyInfoParams
+{
+  public const string Version = "0.1.16";
+  public const string Author = "NovaVoidHowl";
+  public const string CVRParamLibName = "CVRParamLib";
 }

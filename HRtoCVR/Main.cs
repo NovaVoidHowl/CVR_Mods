@@ -16,9 +16,9 @@ using uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients;
 
 namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
 {
-  #pragma warning disable S101
+#pragma warning disable S101
   public class HRtoCVR : MelonMod
-  #pragma warning restore S101
+#pragma warning restore S101
   {
     public enum HRConnectionType
     {
@@ -29,8 +29,8 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
 
     public const string CoreVersion = "0.1.4";
 
-  // Melon Loader vars should stay public
-  #pragma warning disable S1104
+    // Melon Loader vars should stay public
+#pragma warning disable S1104
     // Core Mellon Loader Vars
     public MelonPreferences_Entry<bool> meEnable;
     public MelonPreferences_Entry<bool> meVerboseLogging;
@@ -45,7 +45,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
     // Text File Specific Mellon Loader Vars
     public MelonPreferences_Entry<string> meTextFileLocation;
     public MelonPreferences_Entry<int> meTextFilePollingRate;
-  #pragma warning restore S1104
+#pragma warning restore S1104
 
     // Values to be fed
     private bool HRtoCVRDisabled; // Returns whether the mod's data feed is disabled or not
@@ -59,12 +59,12 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
     // On Melon Load
     public override void OnInitializeMelon()
     {
-  #if DEBUG
+#if DEBUG
       MelonLogger.Error(
         "This mod was compiled in DEBUG mode log spam possible and API keys may be visible in logs,"
           + " do not use in production environment"
       );
-  #endif
+#endif
 
       // Melon Config
       var melonCategoryHRtoCVR = MelonPreferences.CreateCategory(nameof(HRtoCVR));
@@ -256,7 +256,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
     {
       // Dispose of any existing clients
       DisposeCurrentClients();
-    
+
       switch (meHRType.Value)
       {
         case HRConnectionType.Pulsoid:
@@ -308,9 +308,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
       if (oldValue == newValue)
       {
         // no change in value
-  #if DEBUG
+#if DEBUG
         MelonLogger.Msg("HRtoCVR Enable parameter event triggered, but has not changed.");
-  #endif
+#endif
       }
       else
       {
@@ -325,9 +325,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
       if (oldValue == newValue)
       {
         // no change in value
-  #if DEBUG
+#if DEBUG
         MelonLogger.Msg("Min HR parameter event triggered, but has not changed.");
-  #endif
+#endif
       }
       else
       {
@@ -343,9 +343,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
       if (oldValue == newValue)
       {
         // no change in value
-  #if DEBUG
+#if DEBUG
         MelonLogger.Msg("Max HR parameter event triggered, but has not changed.");
-  #endif
+#endif
       }
       else
       {
@@ -437,12 +437,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
 
     private void SetRapidUpdateParameters()
     {
-      AvatarParameterSetter.SetRapidUpdateParameters(
-        _pulsoidClient,
-        _simulatedClient,
-        _textFileClient,
-        meHRType.Value
-      );
+      AvatarParameterSetter.SetRapidUpdateParameters(_pulsoidClient, _simulatedClient, _textFileClient, meHRType.Value);
     }
 
     private void SetMainAvatarParameters(bool resetToDefault = false)
