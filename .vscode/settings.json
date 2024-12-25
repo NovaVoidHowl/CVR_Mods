@@ -25,7 +25,8 @@
     "Qube",
     "searchtags",
     "sourcelink",
-    "steamapps"
+    "steamapps",
+    "wssv"
   ],
   "editor.detectIndentation": false,
   "editor.insertSpaces": true,
