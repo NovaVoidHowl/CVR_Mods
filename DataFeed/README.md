@@ -58,9 +58,10 @@ In addition to the above MellonLoader variables there is `API Key` this is used 
 > first time with the mod installed
 >
 
-for REST API you connect to [http://127.0.0.1:8080/api/state](http://127.0.0.1:8080/api/state)
-for Websocket API you connect to [ws://127.0.0.1:8081/DataFeed](ws://127.0.0.1:8081/DataFeed)
-to authenticate to either you use the header `X-API-Key` with the value of that header being the `API Key` value from
+For REST API you connect to [http://127.0.0.1:8080/api/state](http://127.0.0.1:8080/api/state)\
+For Websocket API you connect to [ws://127.0.0.1:8081/DataFeed](ws://127.0.0.1:8081/DataFeed)
+
+To authenticate to either you use the header `X-API-Key` with the value of that header being the `API Key` value from
 the MellonLoader preferences file in the `DataFeed` section
 
 > [!TIP]
