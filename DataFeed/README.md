@@ -50,7 +50,9 @@ In addition to the above MellonLoader variables there is `API Key` this is used 
 >
 > The API key will not show up in the Mod Settings Menu, this is intentional to reduce the likelihood of accidentally
 > leaking keys (in screenshots etc.)
-\
+
+<br/>
+
 > [!TIP]
 >
 > Your API key for the endpoints will show up in the MellonLoader preferences file after you have run the game for the
