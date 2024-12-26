@@ -87,11 +87,11 @@ feel free to leave bug reports or feature requests!
 
 ## Mods List
 
-| Mod name | More Info                       |   State    | Latest Version Git |   Latest Version CVRMG   | Description                                                     |
-| -------- | ------------------------------- | :--------: | :----------------: | :----------------------: | --------------------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.0.6        |           0.0.4          | Exposes certain interface values as Avatar parameters           |
-| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.15       |          0.1.14          | Provides Heart Rate values as avatar animator parameters        |
-| THtoCVR  | [README.md](THtoCVR/README.md)  | PreRelease |       0.0.1        |           N/A            | Temperature and/or humidity sensor info to avatar animator parameters. |
+| Mod name | More Info                       |   State    | Latest Version Git | Latest Version CVRMG | Description                                                                            |
+| -------- | ------------------------------- | :--------: | :----------------: | :------------------: | -------------------------------------------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.1.0        |        0.0.4         | Exposes certain interface values as Avatar parameters and over REST and Websocket APIs |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.15       |        0.1.14        | Provides Heart Rate values as avatar animator parameters                               |
+| THtoCVR  | [README.md](THtoCVR/README.md)  | PreRelease |       0.0.1        |         N/A          | Temperature and/or humidity sensor info to avatar animator parameters.                 |
 
 ---
 
