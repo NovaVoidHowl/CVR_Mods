@@ -1,16 +1,21 @@
-﻿using ABI_RC.Core.Savior;
+﻿using UnityEngine;
+using System.Collections;
+using MelonLoader;
+using ABI_RC.Core.Savior;
 using ABI_RC.Core.Player;
 using ABI_RC.Systems.GameEventSystem;
 using ABI.CCK.Components;
 using ABI_RC.Systems.Movement;
-using MelonLoader;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.api;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 {
   public class DataFeed : MelonMod
   {
     public event EventHandler StateChanged;
+    public event EventHandler AvatarChanged;
+    public event EventHandler InstanceChanged;
 
     // Melon Loader vars should stay public
 #pragma warning disable S1104
@@ -24,16 +29,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public MelonPreferences_Entry<string> meAPIKey;
 #pragma warning restore S1104
 
-    // Add public getters for the private fields
-    public bool FlyingAllowed => flyingAllowed;
-    public bool PropsAllowed => propsAllowed;
-    public bool PortalsAllowed => portalsAllowed;
-    public bool NameplatesEnabled => nameplatesEnabled;
-    public bool DataFeedErrorBBCC => dataFeedErrorBBCC;
-    public bool DataFeedErrorMetaPort => dataFeedErrorMetaPort;
-    public bool DataFeedDisabled => dataFeedDisabled;
 
-    // Values to be fed
+
+    // Values to be fed to APIs and Avatar Parameters
     private bool flyingAllowed;
     private bool propsAllowed;
     private bool portalsAllowed;
@@ -42,10 +40,53 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     private bool dataFeedErrorMetaPort;
     private bool dataFeedDisabled;
 
+    public bool FlyingAllowed => flyingAllowed;
+    public bool PropsAllowed => propsAllowed;
+    public bool PortalsAllowed => portalsAllowed;
+    public bool NameplatesEnabled => nameplatesEnabled;
+    public bool DataFeedErrorBBCC => dataFeedErrorBBCC;
+    public bool DataFeedErrorMetaPort => dataFeedErrorMetaPort;
+    public bool DataFeedDisabled => dataFeedDisabled;
+
+    // Values to be fed to APIs only
+    #region World Data
+    private string currentInstanceId;
+    private string currentInstanceName;
+    private string currentWorldId;
+    private string currentInstancePrivacy;
+
+    public string CurrentInstanceId => currentInstanceId;
+    public string CurrentInstanceName => currentInstanceName;
+    public string CurrentWorldId => currentWorldId;
+    public string CurrentInstancePrivacy => currentInstancePrivacy;
+    #endregion // World Data
+
+    #region Avatar Data
+    private string currentAvatarId;
+    public string CurrentAvatarId => currentAvatarId;
+    #endregion
+
+
+    #region  Game data
+    private int buildId;
+    private string hardwareId;
+
+    public int BuildId => buildId;
+    public string HardwareId => hardwareId;
+    #endregion // Game data
+
+    #region real-time data
+    private int currentPing;
+    public int CurrentPing => currentPing;
+    #endregion // real-time data
+
+    // API Server
     private ApiConfig apiConfig;
     private ApiServer apiServer;
 
     public ApiConfig ApiConfig => apiConfig;
+
+    private bool isQuitting = false;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -128,18 +169,19 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
       CVRGameEventSystem.Initialization.OnPlayerSetupStart.AddListener(() =>
       {
-        MelonLogger.Msg("Player Setup Start");
+        GeneralHelper.DebugLog("Player Setup Start");
         UpdateDataFeed();
       });
 
       CVRGameEventSystem.Instance.OnConnected.AddListener(
         (string message) =>
         {
-          MelonLogger.Msg("On Instance Load: " + message);
+          GeneralHelper.DebugLog("On Instance Load: " + message);
           UpdateDataFeed();
           PrintCurrentDataFeedValues();
           SetAvatarParameters();
           OnStateChanged();
+          OnInstanceChanged(); // Add this line
         }
       );
 
@@ -147,10 +189,12 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         (CVRAvatar avatar) =>
         {
           // get the game object of the avatar
-          MelonLogger.Msg("On Local Avatar Load: " + avatar.gameObject.name);
+          GeneralHelper.DebugLog("On Local Avatar Load: " + avatar.gameObject.name);
+          currentAvatarId = avatar.gameObject.name;
           UpdateDataFeed();
           PrintCurrentDataFeedValues();
           SetAvatarParameters();
+          OnAvatarChanged(); // Add this line
         }
       );
 
@@ -161,15 +205,15 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         RestApiPort = meRestAPIPort.Value,
         ApiKey = meAPIKey.Value
       };
-#if DEBUG
-      MelonLoader.MelonLogger.Msg($"[DEBUG] Initialized API config with key: {apiConfig.ApiKey}");
-#endif
+      GeneralHelper.DebugLog($"Initialized API config with key: {apiConfig.ApiKey}");
       if (meAPIEnable.Value)
       {
         apiServer = new ApiServer(this, apiConfig);
         apiServer.Start();
       }
       #endregion // api init
+
+      MelonCoroutines.Start(UpdatePingCoroutine());
     }
 
     private void OnMeEnableChanged(bool oldValue, bool newValue)
@@ -177,15 +221,26 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (oldValue == newValue)
       {
         // no change in value
-#if DEBUG
-        MelonLogger.Msg("Data Feed Enable parameter event triggered, but has not changed.");
-#endif
+        GeneralHelper.DebugLog("Data Feed Enable parameter event triggered, but has not changed.");
       }
       else
       {
         MelonLogger.Msg("Data Feed Enabled: " + newValue);
         UpdateDataFeed();
         SetAvatarParameters();
+
+        if (!newValue && apiServer != null)
+        {
+          GeneralHelper.DebugLog("Disabling API Server due to Data Feed being disabled.");
+          apiServer.Stop();
+          apiServer = null;
+        }
+        else if (newValue && meAPIEnable.Value && apiServer == null)
+        {
+          GeneralHelper.DebugLog("Enabling API Server due to Data Feed being enabled.");
+          apiServer = new ApiServer(this, apiConfig);
+          apiServer.Start();
+        }
       }
     }
 
@@ -194,9 +249,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (oldValue == newValue)
       {
         // no change in value
-#if DEBUG
-        MelonLogger.Msg("Avatar Parameter Output Enabled parameter event triggered, but has not changed.");
-#endif
+        GeneralHelper.DebugLog("Avatar Parameter Output Enabled parameter event triggered, but has not changed.");
       }
       else
       {
@@ -211,7 +264,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (oldValue == newValue)
         return;
 
-      if (newValue)
+      if (newValue && meEnable.Value)
       {
         MelonLogger.Msg("API Server Enabled");
         apiServer = new ApiServer(this, apiConfig);
@@ -231,7 +284,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (oldValue == newValue)
         return;
 
-      MelonLogger.Msg($"REST API Port changed from {oldValue} to {newValue}");
+      GeneralHelper.DebugLog($"REST API Port changed from {oldValue} to {newValue}");
       apiConfig.RestApiPort = newValue;
 
       if (meAPIEnable.Value && apiServer != null)
@@ -247,7 +300,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (oldValue == newValue)
         return;
 
-      MelonLogger.Msg($"WebSocket API Port changed from {oldValue} to {newValue}");
+      GeneralHelper.DebugLog($"WebSocket API Port changed from {oldValue} to {newValue}");
       apiConfig.WebSocketPort = newValue;
 
       if (meAPIEnable.Value && apiServer != null)
@@ -310,6 +363,16 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
           portalsAllowed = MetaPort.Instance.worldAllowPortals;
           nameplatesEnabled = MetaPort.Instance.worldEnableNameplates;
           dataFeedErrorMetaPort = false;
+
+          // Update instance and world information
+          currentInstanceId = MetaPort.Instance.CurrentInstanceId;
+          currentInstanceName = MetaPort.Instance.CurrentInstanceName;
+          currentWorldId = MetaPort.Instance.CurrentWorldId;
+          currentInstancePrivacy = MetaPort.Instance.CurrentInstancePrivacy;
+
+          // Update game data
+          buildId = MetaPort.Instance.buildId;
+          hardwareId = MetaPort.Instance.hardwareId;
         }
       }
 
@@ -372,6 +435,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public override void OnApplicationQuit()
     {
       // any on quit code here, ie closing connections etc
+      isQuitting = true; // Set the flag to true when the application is quitting
       if (apiServer != null && meAPIEnable.Value)
       {
         apiServer.Stop();
@@ -381,6 +445,32 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     protected virtual void OnStateChanged()
     {
       StateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnAvatarChanged()
+    {
+      AvatarChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnInstanceChanged()
+    {
+      InstanceChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private IEnumerator UpdatePingCoroutine()
+    {
+      while (true)
+      {
+        if (MetaPort.Instance != null)
+        {
+          currentPing = MetaPort.Instance.currentPing;
+        }
+        if (isQuitting) // Check the flag to break out of the loop
+        {
+          yield break;
+        }
+        yield return new WaitForSeconds(1f); // Update every second
+      }
     }
   }
 }

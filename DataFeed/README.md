@@ -36,7 +36,7 @@ NOTE: if the `dataFeedDisabled` is true you should disregard the values passed b
 
 |             Option              | Description                                                              |
 | :-----------------------------: | :----------------------------------------------------------------------- |
-|             Enable              | Turns the data feed on/off                                               |
+|             Enable              | Turns the mod on/off                                               |
 | Avatar Parameter Output Enabled | Enables/Disables sending the booleans to the avatar controller variables |
 |           API Enable            | turns on/off the websocket and REST API endpoints                        |
 |          REST API Port          | The REST API endpoint port on your system                                |
@@ -58,7 +58,7 @@ In addition to the above MellonLoader variables there is `API Key` this is used 
 > first time with the mod installed
 >
 
-For REST API you connect to [http://127.0.0.1:8080/api/state](http://127.0.0.1:8080/api/state)\
+For REST API you connect to [http://127.0.0.1:8080/api/state](http://127.0.0.1:8080/), a full list of endpoints will be shown\
 For Websocket API you connect to [ws://127.0.0.1:8081/DataFeed](ws://127.0.0.1:8081/DataFeed)
 
 To authenticate to either you use the header `X-API-Key` with the value of that header being the `API Key` value from
