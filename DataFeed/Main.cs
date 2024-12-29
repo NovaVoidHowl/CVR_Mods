@@ -8,6 +8,10 @@ using ABI.CCK.Components;
 using ABI_RC.Systems.Movement;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.api;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.Services;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.Interfaces;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.Models;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 {
@@ -29,56 +33,16 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public MelonPreferences_Entry<string> meAPIKey;
 #pragma warning restore S1104
 
-
-
-    // Values to be fed to APIs and Avatar Parameters
-    private bool flyingAllowed;
-    private bool propsAllowed;
-    private bool portalsAllowed;
-    private bool nameplatesEnabled;
-    private bool dataFeedErrorBBCC;
-    private bool dataFeedErrorMetaPort;
+    // Data Feed Vars
     private bool dataFeedDisabled;
-
-    public bool FlyingAllowed => flyingAllowed;
-    public bool PropsAllowed => propsAllowed;
-    public bool PortalsAllowed => portalsAllowed;
-    public bool NameplatesEnabled => nameplatesEnabled;
-    public bool DataFeedErrorBBCC => dataFeedErrorBBCC;
-    public bool DataFeedErrorMetaPort => dataFeedErrorMetaPort;
     public bool DataFeedDisabled => dataFeedDisabled;
-
-    // Values to be fed to APIs only
-    #region World Data
-    private string currentInstanceId;
-    private string currentInstanceName;
-    private string currentWorldId;
-    private string currentInstancePrivacy;
-
-    public string CurrentInstanceId => currentInstanceId;
-    public string CurrentInstanceName => currentInstanceName;
-    public string CurrentWorldId => currentWorldId;
-    public string CurrentInstancePrivacy => currentInstancePrivacy;
-    #endregion // World Data
 
     #region Avatar Data
     private string currentAvatarId;
     public string CurrentAvatarId => currentAvatarId;
+    private AvatarAbiApiInfo currentAvatarDetails;
+    public AvatarAbiApiInfo CurrentAvatarDetails => currentAvatarDetails;
     #endregion
-
-
-    #region  Game data
-    private int buildId;
-    private string hardwareId;
-
-    public int BuildId => buildId;
-    public string HardwareId => hardwareId;
-    #endregion // Game data
-
-    #region real-time data
-    private int currentPing;
-    public int CurrentPing => currentPing;
-    #endregion // real-time data
 
     // API Server
     private ApiConfig apiConfig;
@@ -86,7 +50,23 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
     public ApiConfig ApiConfig => apiConfig;
 
-    private bool isQuitting = false;
+    private readonly object _stateLock = new object();
+    private bool _isQuitting;
+
+    private readonly IMetaPortDataReader _metaPortReader;
+    private readonly IAvatarParameterManager _avatarParameterManager;
+    private readonly IBetterBetterCharacterControllerDataReader _bbccReader;
+
+    public DataFeed()
+    {
+      _metaPortReader = new MetaPortDataReader();
+      _avatarParameterManager = new AvatarParameterManager();
+      _bbccReader = new BetterBetterCharacterControllerDataReader();
+    }
+
+    // Expose the interface readers
+    public IMetaPortDataReader MetaPortReader => _metaPortReader;
+    public IBetterBetterCharacterControllerDataReader BBCCReader => _bbccReader;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -173,30 +153,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         UpdateDataFeed();
       });
 
-      CVRGameEventSystem.Instance.OnConnected.AddListener(
-        (string message) =>
-        {
-          GeneralHelper.DebugLog("On Instance Load: " + message);
-          UpdateDataFeed();
-          PrintCurrentDataFeedValues();
-          SetAvatarParameters();
-          OnStateChanged();
-          OnInstanceChanged(); // Add this line
-        }
-      );
-
-      CVRGameEventSystem.Avatar.OnLocalAvatarLoad.AddListener(
-        (CVRAvatar avatar) =>
-        {
-          // get the game object of the avatar
-          GeneralHelper.DebugLog("On Local Avatar Load: " + avatar.gameObject.name);
-          currentAvatarId = avatar.gameObject.name;
-          UpdateDataFeed();
-          PrintCurrentDataFeedValues();
-          SetAvatarParameters();
-          OnAvatarChanged(); // Add this line
-        }
-      );
+      CVRGameEventSystem.Instance.OnConnected.AddListener(OnInstanceConnected);
+      CVRGameEventSystem.Avatar.OnLocalAvatarLoad.AddListener(OnAvatarLoaded);
 
       #region api init
       apiConfig = new ApiConfig
@@ -311,70 +269,68 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       }
     }
 
+    private void OnInstanceConnected(string message)
+    {
+      lock (_stateLock)
+      {
+        UpdateDataFeed();
+        PrintCurrentDataFeedValues();
+        SetAvatarParameters();
+        OnStateChanged();
+        OnInstanceChanged();
+      }
+    }
+
+    private async void OnAvatarLoaded(CVRAvatar avatar)
+    {
+      if (avatar?.gameObject == null)
+        return;
+
+      GameObject currentAvatarGameObject = avatar.gameObject;
+      // get the CVRAssetInfo component on the avatar
+      CVRAssetInfo assetInfo = currentAvatarGameObject.GetComponent<CVRAssetInfo>();
+      if (assetInfo == null) // should not be possible, but just in case
+      {
+        MelonLogger.Warning("CVRAvatarAssetInfo component not found on avatar.");
+        return;
+      }
+
+      string avatarId = assetInfo.objectId;
+      AvatarAbiApiInfo avatarDetails = null;
+
+      // Fetch avatar details from ABI API outside of lock
+      try
+      {
+        avatarDetails = await AvatarAbiApiService.RequestAvatarDetails(avatarId);
+      }
+      catch (Exception ex)
+      {
+        MelonLogger.Error($"Failed to fetch avatar details for {avatarId}: {ex.Message}");
+      }
+
+      lock (_stateLock)
+      {
+        currentAvatarId = avatarId;
+        currentAvatarDetails = avatarDetails;
+
+        UpdateDataFeed();
+        PrintCurrentDataFeedValues();
+        SetAvatarParameters();
+        OnAvatarChanged();
+      }
+    }
+
     private void UpdateDataFeed()
     {
-      bool stateChanged = false;
-
       if (!meEnable.Value)
       {
-        stateChanged |= !flyingAllowed;
-        stateChanged |= !propsAllowed;
-        stateChanged |= !portalsAllowed;
-        stateChanged |= !nameplatesEnabled;
-        stateChanged |= dataFeedDisabled;
-
-        flyingAllowed = true;
-        propsAllowed = true;
-        portalsAllowed = true;
-        nameplatesEnabled = true;
-        dataFeedDisabled = true;
+        UpdateDisabledState();
+        return;
       }
-      else
-      {
-        stateChanged |= dataFeedDisabled;
-        dataFeedDisabled = false;
 
-        if (BetterBetterCharacterController.Instance == null)
-        {
-          stateChanged |= !dataFeedErrorBBCC;
-          dataFeedErrorBBCC = true;
-        }
-        else
-        {
-          stateChanged |= flyingAllowed != BetterBetterCharacterController.Instance.FlightAllowedInWorld;
-          stateChanged |= dataFeedErrorBBCC;
-          flyingAllowed = BetterBetterCharacterController.Instance.FlightAllowedInWorld;
-          dataFeedErrorBBCC = false;
-        }
-
-        if (MetaPort.Instance == null)
-        {
-          stateChanged |= dataFeedErrorMetaPort;
-          dataFeedErrorMetaPort = true;
-        }
-        else
-        {
-          stateChanged |= propsAllowed != MetaPort.Instance.worldAllowProps;
-          stateChanged |= portalsAllowed != MetaPort.Instance.worldAllowPortals;
-          stateChanged |= nameplatesEnabled != MetaPort.Instance.worldEnableNameplates;
-          stateChanged |= dataFeedErrorMetaPort;
-
-          propsAllowed = MetaPort.Instance.worldAllowProps;
-          portalsAllowed = MetaPort.Instance.worldAllowPortals;
-          nameplatesEnabled = MetaPort.Instance.worldEnableNameplates;
-          dataFeedErrorMetaPort = false;
-
-          // Update instance and world information
-          currentInstanceId = MetaPort.Instance.CurrentInstanceId;
-          currentInstanceName = MetaPort.Instance.CurrentInstanceName;
-          currentWorldId = MetaPort.Instance.CurrentWorldId;
-          currentInstancePrivacy = MetaPort.Instance.CurrentInstancePrivacy;
-
-          // Update game data
-          buildId = MetaPort.Instance.buildId;
-          hardwareId = MetaPort.Instance.hardwareId;
-        }
-      }
+      var stateChanged = false;
+      stateChanged |= _bbccReader.UpdateBBCCState();
+      stateChanged |= _metaPortReader.UpdateMetaPortState();
 
       if (stateChanged)
       {
@@ -382,64 +338,52 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       }
     }
 
+    private void UpdateDisabledState()
+    {
+      dataFeedDisabled = true;
+      OnStateChanged();
+    }
+
     private void SetAvatarParameters()
     {
-      // check if the mod is enabled
-      if (!meEnable.Value || !meAvatarParamSetEnabled.Value)
-      {
-        // Feed disabled
-        // main data feed
-        PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", true);
-        PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", true);
-        PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", true);
-        PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", true);
+      var worldRules = new WorldRuleParameters(
+        meAvatarParamSetEnabled.Value,
+        BBCCReader.FlyingAllowed,
+        MetaPortReader.PropsAllowed,
+        MetaPortReader.PortalsAllowed,
+        MetaPortReader.NameplatesEnabled
+      );
 
-        // mod status data feed
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", false);
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", false);
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", true);
+      var modStatus = new ModStatusParameters(meEnable.Value, DataFeedDisabled, !meAPIEnable.Value);
 
-        MelonLogger.Msg("Avatar Data Feed Disabled, Parameters set to default.");
-      }
-      else
-      {
-        // main data feed
-        PlayerSetup.Instance.animatorManager.SetParameter("flyingAllowed", FlyingAllowed);
-        PlayerSetup.Instance.animatorManager.SetParameter("propsAllowed", PropsAllowed);
-        PlayerSetup.Instance.animatorManager.SetParameter("portalsAllowed", PortalsAllowed);
-        PlayerSetup.Instance.animatorManager.SetParameter("nameplatesEnabled", NameplatesEnabled);
+      var platformState = new PlatformStateParameters(
+        BBCCReader.DataFeedErrorBBCC,
+        MetaPortReader.DataFeedErrorMetaPort
+      );
 
-        // mod status data feed
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorBBCC", DataFeedErrorBBCC);
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedErrorMetaPort", DataFeedErrorMetaPort);
-        PlayerSetup.Instance.animatorManager.SetParameter("dataFeedDisabled", DataFeedDisabled);
-
-        MelonLogger.Msg("Avatar Parameters Set.");
-      }
+      _avatarParameterManager.SetParameters(worldRules, modStatus, platformState);
     }
 
     private void PrintCurrentDataFeedValues()
     {
       // Log the values to the melon logger
       MelonLogger.Msg("Data Feed:");
-      MelonLogger.Msg("FlyingAllowed: " + FlyingAllowed);
-      MelonLogger.Msg("PropsAllowed: " + PropsAllowed);
-      MelonLogger.Msg("PortalsAllowed: " + PortalsAllowed);
-      MelonLogger.Msg("NameplatesEnabled: " + NameplatesEnabled);
+      MelonLogger.Msg("FlyingAllowed: " + BBCCReader.FlyingAllowed);
+      MelonLogger.Msg("PropsAllowed: " + MetaPortReader.PropsAllowed);
+      MelonLogger.Msg("PortalsAllowed: " + MetaPortReader.PortalsAllowed);
+      MelonLogger.Msg("NameplatesEnabled: " + MetaPortReader.NameplatesEnabled);
       MelonLogger.Msg("Data Feed Status:");
-      MelonLogger.Msg("BBCC Error: " + DataFeedErrorBBCC);
-      MelonLogger.Msg("MetaPort Error: " + DataFeedErrorMetaPort);
+      MelonLogger.Msg("BBCC Error: " + BBCCReader.DataFeedErrorBBCC);
+      MelonLogger.Msg("MetaPort Error: " + MetaPortReader.DataFeedErrorMetaPort);
       MelonLogger.Msg("Data Feed Disabled: " + DataFeedDisabled);
     }
 
     public override void OnApplicationQuit()
     {
       // any on quit code here, ie closing connections etc
-      isQuitting = true; // Set the flag to true when the application is quitting
-      if (apiServer != null && meAPIEnable.Value)
-      {
-        apiServer.Stop();
-      }
+
+      _isQuitting = true;
+      apiServer?.Stop();
     }
 
     protected virtual void OnStateChanged()
@@ -459,17 +403,12 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
     private IEnumerator UpdatePingCoroutine()
     {
-      while (true)
+      // This can be removed as ping updates are now handled by MetaPortReader
+      var waitTime = new WaitForSeconds(1f);
+      while (!_isQuitting)
       {
-        if (MetaPort.Instance != null)
-        {
-          currentPing = MetaPort.Instance.currentPing;
-        }
-        if (isQuitting) // Check the flag to break out of the loop
-        {
-          yield break;
-        }
-        yield return new WaitForSeconds(1f); // Update every second
+        _metaPortReader.UpdateMetaPortState();
+        yield return waitTime;
       }
     }
   }

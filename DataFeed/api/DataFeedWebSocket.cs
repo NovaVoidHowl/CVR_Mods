@@ -2,38 +2,64 @@ using WebSocketSharp;
 using WebSocketSharp.Server;
 using System.Text.Json;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 {
-  public class DataFeedWebSocketParametersV1 : WebSocketBehavior
+  public abstract class DataFeedWebSocketBase : WebSocketBehavior
   {
-    private readonly DataFeed _dataFeed;
+    protected readonly DataFeed _dataFeed;
 
-    public DataFeedWebSocketParametersV1(DataFeed dataFeed)
+    protected DataFeedWebSocketBase(DataFeed dataFeed)
     {
       _dataFeed = dataFeed;
-      _dataFeed.StateChanged += OnStateChanged;
     }
 
     protected override void OnOpen()
     {
-      GeneralHelper.DebugLog("WebSocket connection attempt...");
+      GeneralHelper.DebugLog($"WebSocket connection attempt for {GetConnectionType()}...");
 
-      var headers = Context.Headers;
-      var apiKey = headers[ApiConstants.ApiKeyHeader];
+      if (!ValidateApiKey())
+      {
+        return;
+      }
+
+      GeneralHelper.DebugLog($"WebSocket connection authenticated for {GetConnectionType()}");
+      SendInitialData();
+      base.OnOpen();
+    }
+
+    private bool ValidateApiKey()
+    {
+      var apiKey = Context.Headers[ApiConstants.ApiKeyHeader];
       var configKey = _dataFeed.ApiConfig.ApiKey;
 
       if (!ApiHelper.IsValidApiKey(apiKey, configKey))
       {
         MelonLoader.MelonLogger.Error($"{ApiConstants.ApiKeyInvalidError}: {apiKey}");
         Context.WebSocket.Close(CloseStatusCode.PolicyViolation, ApiConstants.ApiKeyInvalidError);
-        return;
+        return false;
       }
-
-      GeneralHelper.DebugLog("WebSocket connection authenticated");
-      SendCurrentState(); // Send initial state on connection
-      base.OnOpen();
+      return true;
     }
+
+    protected abstract string GetConnectionType();
+    protected abstract void SendInitialData();
+
+    protected void SendJsonData(object data) => Send(JsonSerializer.Serialize(data));
+  }
+
+  public class DataFeedWebSocketParametersV1 : DataFeedWebSocketBase
+  {
+    public DataFeedWebSocketParametersV1(DataFeed dataFeed)
+      : base(dataFeed)
+    {
+      _dataFeed.StateChanged += OnStateChanged;
+    }
+
+    protected override string GetConnectionType() => "parameters";
+
+    protected override void SendInitialData() => SendCurrentState();
 
     protected override void OnClose(CloseEventArgs e)
     {
@@ -41,180 +67,110 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       base.OnClose(e);
     }
 
-    private void OnStateChanged(object sender, System.EventArgs e)
-    {
-      SendCurrentState();
-    }
+    private void OnStateChanged(object sender, System.EventArgs e) => SendCurrentState();
 
     private void SendCurrentState()
     {
-      var state = new
-      {
-        flyingAllowed = _dataFeed.FlyingAllowed,
-        propsAllowed = _dataFeed.PropsAllowed,
-        portalsAllowed = _dataFeed.PortalsAllowed,
-        nameplatesEnabled = _dataFeed.NameplatesEnabled,
-        dataFeedErrorBBCC = _dataFeed.DataFeedErrorBBCC,
-        dataFeedErrorMetaPort = _dataFeed.DataFeedErrorMetaPort,
-        dataFeedDisabled = _dataFeed.DataFeedDisabled
-      };
-      Send(JsonSerializer.Serialize(state));
+      SendJsonData(
+        new
+        {
+          flyingAllowed = _dataFeed.BBCCReader.FlyingAllowed,
+          propsAllowed = _dataFeed.MetaPortReader.PropsAllowed,
+          portalsAllowed = _dataFeed.MetaPortReader.PortalsAllowed,
+          nameplatesEnabled = _dataFeed.MetaPortReader.NameplatesEnabled,
+          dataFeedErrorBBCC = _dataFeed.BBCCReader.DataFeedErrorBBCC,
+          dataFeedErrorMetaPort = _dataFeed.MetaPortReader.DataFeedErrorMetaPort,
+          dataFeedDisabled = _dataFeed.DataFeedDisabled
+        }
+      );
     }
 
     protected override void OnMessage(MessageEventArgs e)
     {
-      switch (e.Data)
-      {
-        case "get_state":
-          SendCurrentState();
-          break;
-      }
+      if (e.Data == "get_state")
+        SendCurrentState();
     }
   }
 
-  public class DataFeedInstanceWebSocketV1 : WebSocketBehavior
+  public class DataFeedInstanceWebSocketV1 : DataFeedWebSocketBase
   {
-    private readonly DataFeed _dataFeed;
-
     public DataFeedInstanceWebSocketV1(DataFeed dataFeed)
-    {
-      _dataFeed = dataFeed;
-    }
+      : base(dataFeed) { }
 
-    protected override void OnOpen()
-    {
-      GeneralHelper.DebugLog("WebSocket connection attempt for instance data...");
+    protected override string GetConnectionType() => "instance data";
 
-      var headers = Context.Headers;
-      var apiKey = headers[ApiConstants.ApiKeyHeader];
-      var configKey = _dataFeed.ApiConfig.ApiKey;
-
-      if (!ApiHelper.IsValidApiKey(apiKey, configKey))
-      {
-        MelonLoader.MelonLogger.Error($"{ApiConstants.ApiKeyInvalidError}: {apiKey}");
-        Context.WebSocket.Close(CloseStatusCode.PolicyViolation, ApiConstants.ApiKeyInvalidError);
-        return;
-      }
-
-      GeneralHelper.DebugLog("WebSocket connection authenticated for instance data");
-      SendInstanceInfo(); // Send initial instance info on connection
-      base.OnOpen();
-    }
+    protected override void SendInitialData() => SendInstanceInfo();
 
     private void SendInstanceInfo()
     {
-      var instanceInfo = new
-      {
-        currentInstanceId = _dataFeed.CurrentInstanceId,
-        currentInstanceName = _dataFeed.CurrentInstanceName,
-        currentWorldId = _dataFeed.CurrentWorldId,
-        currentInstancePrivacy = _dataFeed.CurrentInstancePrivacy
-      };
-      Send(JsonSerializer.Serialize(instanceInfo));
+      SendJsonData(
+        new
+        {
+          currentInstanceId = _dataFeed.MetaPortReader.CurrentInstanceId,
+          currentInstanceName = _dataFeed.MetaPortReader.CurrentInstanceName,
+          currentWorldId = _dataFeed.MetaPortReader.CurrentWorldId,
+          currentInstancePrivacy = _dataFeed.MetaPortReader.CurrentInstancePrivacy
+        }
+      );
     }
 
     public void NotifyClients()
     {
       if (Sessions != null)
-      {
         SendInstanceInfo();
-      }
     }
 
     protected override void OnMessage(MessageEventArgs e)
     {
-      switch (e.Data)
-      {
-        case "get_instance":
-          SendInstanceInfo();
-          break;
-      }
+      if (e.Data == "get_instance")
+        SendInstanceInfo();
     }
   }
 
-  public class DataFeedAvatarWebSocketV1 : WebSocketBehavior
+  public class DataFeedAvatarWebSocketV1 : DataFeedWebSocketBase
   {
-    private readonly DataFeed _dataFeed;
-
     public DataFeedAvatarWebSocketV1(DataFeed dataFeed)
-    {
-      _dataFeed = dataFeed;
-    }
+      : base(dataFeed) { }
 
-    protected override void OnOpen()
-    {
-      GeneralHelper.DebugLog("WebSocket connection attempt for avatar data...");
+    protected override string GetConnectionType() => "avatar data";
 
-      var headers = Context.Headers;
-      var apiKey = headers[ApiConstants.ApiKeyHeader];
-      var configKey = _dataFeed.ApiConfig.ApiKey;
-
-      if (!ApiHelper.IsValidApiKey(apiKey, configKey))
-      {
-        MelonLoader.MelonLogger.Error($"{ApiConstants.ApiKeyInvalidError}: {apiKey}");
-        Context.WebSocket.Close(CloseStatusCode.PolicyViolation, ApiConstants.ApiKeyInvalidError);
-        return;
-      }
-
-      GeneralHelper.DebugLog("WebSocket connection authenticated for avatar data");
-      SendAvatarInfo(); // Send initial avatar info on connection
-      base.OnOpen();
-    }
+    protected override void SendInitialData() => SendAvatarInfo();
 
     private void SendAvatarInfo()
     {
-      var avatarInfo = new { currentAvatarId = _dataFeed.CurrentAvatarId };
-      Send(JsonSerializer.Serialize(avatarInfo));
+      SendJsonData(
+        new
+        {
+          currentAvatarId = _dataFeed.CurrentAvatarId,
+          avatarDetails = _dataFeed.CurrentAvatarDetails ?? new AvatarAbiApiInfo(),
+          detailsAvailable = _dataFeed.CurrentAvatarDetails != null
+        }
+      );
     }
 
     public void NotifyClients()
     {
       if (Sessions != null)
-      {
         SendAvatarInfo();
-      }
     }
 
     protected override void OnMessage(MessageEventArgs e)
     {
-      switch (e.Data)
-      {
-        case "get_avatar":
-          SendAvatarInfo();
-          break;
-      }
+      if (e.Data == "get_avatar")
+        SendAvatarInfo();
     }
   }
 
-  public class DataFeedRealTimeWebSocketV1 : WebSocketBehavior
+  public class DataFeedRealTimeWebSocketV1 : DataFeedWebSocketBase
   {
-    private readonly DataFeed _dataFeed;
     private bool _isRunning = true;
 
     public DataFeedRealTimeWebSocketV1(DataFeed dataFeed)
-    {
-      _dataFeed = dataFeed;
-    }
+      : base(dataFeed) { }
 
-    protected override async void OnOpen()
-    {
-      GeneralHelper.DebugLog("WebSocket connection attempt for real-time data...");
+    protected override string GetConnectionType() => "real-time data";
 
-      var headers = Context.Headers;
-      var apiKey = headers[ApiConstants.ApiKeyHeader];
-      var configKey = _dataFeed.ApiConfig.ApiKey;
-
-      if (!ApiHelper.IsValidApiKey(apiKey, configKey))
-      {
-        MelonLoader.MelonLogger.Error($"{ApiConstants.ApiKeyInvalidError}: {apiKey}");
-        Context.WebSocket.Close(CloseStatusCode.PolicyViolation, ApiConstants.ApiKeyInvalidError);
-        return;
-      }
-
-      GeneralHelper.DebugLog("WebSocket connection authenticated for real-time data");
-      base.OnOpen();
-      await SendRealTimeData();
-    }
+    protected override void SendInitialData() => _ = SendRealTimeData();
 
     protected override void OnClose(CloseEventArgs e)
     {
@@ -226,9 +182,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     {
       while (_isRunning)
       {
-        var realTimeData = new { currentPing = _dataFeed.CurrentPing };
-        Send(JsonSerializer.Serialize(realTimeData));
-        await Task.Delay(1000); // Send update every second
+        SendJsonData(new { currentPing = _dataFeed.MetaPortReader.CurrentPing });
+        await Task.Delay(1000);
       }
     }
   }

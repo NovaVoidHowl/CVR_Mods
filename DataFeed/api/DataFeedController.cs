@@ -3,6 +3,7 @@ using EmbedIO.WebApi;
 using EmbedIO;
 using EmbedIO.Routing;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 {
@@ -31,12 +32,12 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 
       var state = new
       {
-        flyingAllowed = _dataFeed.FlyingAllowed,
-        propsAllowed = _dataFeed.PropsAllowed,
-        portalsAllowed = _dataFeed.PortalsAllowed,
-        nameplatesEnabled = _dataFeed.NameplatesEnabled,
-        dataFeedErrorBBCC = _dataFeed.DataFeedErrorBBCC,
-        dataFeedErrorMetaPort = _dataFeed.DataFeedErrorMetaPort,
+        flyingAllowed = _dataFeed.BBCCReader.FlyingAllowed,
+        propsAllowed = _dataFeed.MetaPortReader.PropsAllowed,
+        portalsAllowed = _dataFeed.MetaPortReader.PortalsAllowed,
+        nameplatesEnabled = _dataFeed.MetaPortReader.NameplatesEnabled,
+        dataFeedErrorBBCC = _dataFeed.BBCCReader.DataFeedErrorBBCC,
+        dataFeedErrorMetaPort = _dataFeed.MetaPortReader.DataFeedErrorMetaPort,
         dataFeedDisabled = _dataFeed.DataFeedDisabled
       };
 
@@ -61,10 +62,10 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 
       var instanceInfo = new
       {
-        currentInstanceId = _dataFeed.CurrentInstanceId,
-        currentInstanceName = _dataFeed.CurrentInstanceName,
-        currentWorldId = _dataFeed.CurrentWorldId,
-        currentInstancePrivacy = _dataFeed.CurrentInstancePrivacy
+        currentInstanceId = _dataFeed.MetaPortReader.CurrentInstanceId,
+        currentInstanceName = _dataFeed.MetaPortReader.CurrentInstanceName,
+        currentWorldId = _dataFeed.MetaPortReader.CurrentWorldId,
+        currentInstancePrivacy = _dataFeed.MetaPortReader.CurrentInstancePrivacy
       };
 
       GeneralHelper.DebugLog("Instance info retrieved successfully.");
@@ -86,7 +87,12 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         return new { error = ApiConstants.ApiKeyInvalidError };
       }
 
-      var avatarInfo = new { currentAvatarId = _dataFeed.CurrentAvatarId };
+      var avatarInfo = new
+      {
+        currentAvatarId = _dataFeed.CurrentAvatarId,
+        avatarDetails = _dataFeed.CurrentAvatarDetails ?? new AvatarAbiApiInfo(),
+        detailsAvailable = _dataFeed.CurrentAvatarDetails != null
+      };
 
       GeneralHelper.DebugLog("Avatar info retrieved successfully.");
       Response.ContentType = ApiConstants.jsonContentType;
@@ -107,7 +113,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         return new { error = ApiConstants.ApiKeyInvalidError };
       }
 
-      var realTimeData = new { currentPing = _dataFeed.CurrentPing };
+      var realTimeData = new { currentPing = _dataFeed.MetaPortReader.CurrentPing };
 
       GeneralHelper.DebugLog("Real-time data retrieved successfully.");
       Response.ContentType = ApiConstants.jsonContentType;
