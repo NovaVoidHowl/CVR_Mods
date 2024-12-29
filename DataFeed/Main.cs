@@ -234,6 +234,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         apiServer?.Stop();
         apiServer = null;
       }
+
+      // Update the avatar parameters
+      SetAvatarParameters();
     }
 
     // Update existing OnMeAPIPortChanged method
@@ -322,9 +325,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
     private void UpdateDataFeed()
     {
+      // Update dataFeedDisabled based on meEnable value
+      dataFeedDisabled = !meEnable.Value;
+
       if (!meEnable.Value)
       {
-        UpdateDisabledState();
         return;
       }
 
@@ -336,12 +341,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       {
         OnStateChanged();
       }
-    }
-
-    private void UpdateDisabledState()
-    {
-      dataFeedDisabled = true;
-      OnStateChanged();
     }
 
     private void SetAvatarParameters()
