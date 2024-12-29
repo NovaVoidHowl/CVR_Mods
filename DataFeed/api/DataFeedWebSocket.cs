@@ -109,7 +109,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
           currentInstanceId = _dataFeed.MetaPortReader.CurrentInstanceId,
           currentInstanceName = _dataFeed.MetaPortReader.CurrentInstanceName,
           currentWorldId = _dataFeed.MetaPortReader.CurrentWorldId,
-          currentInstancePrivacy = _dataFeed.MetaPortReader.CurrentInstancePrivacy
+          currentInstancePrivacy = _dataFeed.MetaPortReader.CurrentInstancePrivacy,
+          worldDetails = _dataFeed.CurrentWorldDetails ?? new WorldAbiApiInfo(),
+          detailsAvailable = _dataFeed.CurrentWorldDetails != null
         }
       );
     }

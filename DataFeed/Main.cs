@@ -44,6 +44,13 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public AvatarAbiApiInfo CurrentAvatarDetails => currentAvatarDetails;
     #endregion
 
+    #region World Data
+    private string currentWorldId;
+    public string CurrentWorldId => currentWorldId;
+    private WorldAbiApiInfo currentWorldDetails;
+    public WorldAbiApiInfo CurrentWorldDetails => currentWorldDetails;
+    #endregion
+
     // API Server
     private ApiConfig apiConfig;
     private ApiServer apiServer;
@@ -272,10 +279,29 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       }
     }
 
-    private void OnInstanceConnected(string message)
+    private async void OnInstanceConnected(string message)
     {
+      string worldId = _metaPortReader.CurrentWorldId;
+      WorldAbiApiInfo worldDetails = null;
+
+      // Fetch world details from ABI API outside of lock
+      try
+      {
+        if (!string.IsNullOrEmpty(worldId))
+        {
+          worldDetails = await WorldAbiApiService.RequestWorldDetails(worldId);
+        }
+      }
+      catch (Exception ex)
+      {
+        MelonLogger.Error($"Failed to fetch world details for {worldId}: {ex.Message}");
+      }
+
       lock (_stateLock)
       {
+        currentWorldId = worldId;
+        currentWorldDetails = worldDetails;
+
         UpdateDataFeed();
         PrintCurrentDataFeedValues();
         SetAvatarParameters();
@@ -371,6 +397,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       MelonLogger.Msg("PropsAllowed: " + MetaPortReader.PropsAllowed);
       MelonLogger.Msg("PortalsAllowed: " + MetaPortReader.PortalsAllowed);
       MelonLogger.Msg("NameplatesEnabled: " + MetaPortReader.NameplatesEnabled);
+      MelonLogger.Msg("Current World ID: " + currentWorldId);
+      MelonLogger.Msg("World Details Available: " + (currentWorldDetails != null));
       MelonLogger.Msg("Data Feed Status:");
       MelonLogger.Msg("BBCC Error: " + BBCCReader.DataFeedErrorBBCC);
       MelonLogger.Msg("MetaPort Error: " + MetaPortReader.DataFeedErrorMetaPort);
