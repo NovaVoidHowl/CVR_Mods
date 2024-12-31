@@ -70,6 +70,75 @@ the MellonLoader preferences file in the `DataFeed` section
 > You can find the MellonLoader preferences file under your ChilloutVR install folder in `/UserData/MelonPreferences.cfg`
 >
 
+### Example API output
+
+The following are example outputs from the mod's API endpoints
+
+#### Instance
+
+```json
+{
+    "currentInstanceId": "i+74a8fa0301855f7a-001003-5d0e8d-173e8a16",
+    "currentInstanceName": "ChilloutVR Hub (#111098)",
+    "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
+    "currentInstancePrivacy": "OwnerMustInvite",
+    "worldDetails": {
+        "Tags": [],
+        "CompatibilityVersion": 2,
+        "Platform": 0,
+        "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
+        "AuthorName": "ChilloutVR",
+        "UploadedAt": "2020-04-06T20:50:25",
+        "UpdatedAt": "2024-03-27T02:23:12",
+        "Categories": [],
+        "FileSize": 44292857
+    },
+    "detailsAvailable": true
+}
+```
+
+#### Avatar
+
+```json
+{
+    "currentAvatarId": "17c267db-18c4-4900-bb73-ad323f082640",
+    "avatarDetails": {
+        "AvatarName": "Space Robot Kyle",
+        "SwitchPermitted": true,
+        "IsPublished": true,
+        "Description": "by Unity Technologies",
+        "AuthorName": "ChilloutVR",
+        "UploadedAt": "2020-01-24T17:24:58",
+        "UpdatedAt": "2023-05-16T11:33:02",
+        "Categories": [],
+        "FileSize": 1267287
+    },
+    "detailsAvailable": true
+}
+```
+
+#### Parameters
+
+```json
+{
+    "flyingAllowed": true,
+    "propsAllowed": true,
+    "portalsAllowed": true,
+    "nameplatesEnabled": true,
+    "dataFeedErrorBBCC": false,
+    "dataFeedErrorMetaPort": false,
+    "dataFeedDisabled": false
+}
+```
+
+#### Realtime
+
+```json
+{
+    "currentPing": 22
+}
+```
+
 ## Future goals
 
 Add OSC output for external apps to read from

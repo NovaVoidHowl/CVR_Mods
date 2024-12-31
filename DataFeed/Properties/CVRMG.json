@@ -9,7 +9,10 @@
   "description": "This mod provides a Data Feed of additional parameters from ChilloutVR to avatars via animator and also via localhost REST/Websocket API, please see source link for more information.",
   "searchtags": [
     "animator",
-    "parameter"
+    "parameter",
+    "API",
+    "REST",
+    "Websocket"
   ],
   "requirements": [],
   "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/DataFeed.dll",
