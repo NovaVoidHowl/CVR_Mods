@@ -12,6 +12,7 @@
     "gameversion",
     "kafeijao",
     "loaderversion",
+    "Maebbie",
     "mdformat",
     "modtype",
     "modversion",
@@ -30,9 +31,7 @@
   ],
   "editor.detectIndentation": false,
   "editor.insertSpaces": true,
-  "editor.rulers": [
-    120
-  ],
+  "editor.rulers": [120],
   "editor.tabSize": 2,
-  "vscord.enabled": false 
+  "vscord.enabled": false
 }
