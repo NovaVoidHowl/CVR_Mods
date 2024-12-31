@@ -9,8 +9,8 @@
   "description": "This mod provides Heart Rate values as avatar animator parameters, please see source link for more information.",
   "searchtags": ["animator", "parameter", "heart rate"],
   "requirements": [],
-  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r2/HRtoCVR.dll",
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/HRtoCVR.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/HRtoCVR",
-  "changelog": "Initial Release",
+  "changelog": ".net 4.8 update",
   "embedcolor": "FFBC00"
 }

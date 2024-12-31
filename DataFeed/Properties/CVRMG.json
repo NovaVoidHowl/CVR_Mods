@@ -17,6 +17,6 @@
   "requirements": [],
   "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/DataFeed.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
-  "changelog": "Recompile for 2024r177",
+  "changelog": ".net4.8 update + add REST & Websocket API",
   "embedcolor": "FFBC00"
 }
