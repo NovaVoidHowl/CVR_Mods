@@ -15,13 +15,23 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![LGPL2 License][license-shield]][license-url]
+<!-- CODE TEST -->
+[<img src="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="SonarQube Cloud" width="140"/>](https://sonarcloud.io/summary/new_code?id=NovaVoidHowl_CVR_Mods)\
+![Lines of Code][sonarcloud-loc]
+![Bugs][sonarcloud-bugs]
+![Code Smells][sonarcloud-code-smells]
+![Vulnerabilities][sonarcloud-vulnerabilities]
+![Duplicated Lines (%)][sonarcloud-duplicated-lines]
+![Reliability Rating][sonarcloud-reliability]
+![Security Rating][sonarcloud-security]
+![Maintainability Rating][sonarcloud-maintainability]
 
 <!-- PROJECT LOGO -->
 
 <br />
 <div align="center">
 
-<h3 align="center">NovaVoidHowls's CVR Mods</h3>
+<h3 align="center">NovaVoidHowl's CVR Mods</h3>
 
 <p align="center">
     <br />
@@ -66,24 +76,22 @@
 Welcome to my little collection of mods for [ChilloutVR](https://abinteractive.net/),
 feel free to leave bug reports or feature requests!
 
-> ---
+> [!NOTE]
 >
-> ⚠️ **Notice!** ⚠️
+> ⚠️ This project is an independent creation and is not affiliated with, supported by, or approved by Alpha Blend
+> Interactive ⚠️
 >
-> This project is an independent creation and is not affiliated with, supported by, or approved by Alpha Blend
-> Interactive
->
-> ---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- MOD LIST -->
 
 ## Mods List
 
-| Mod name | More Info                       | State | Latest Version Git |   Latest Version CVRMG   | Description                                              |
-| -------- | ------------------------------- | :---: | :----------------: | :----------------------: | -------------------------------------------------------- |
-| DataFeed | [README.md](DataFeed/README.md) | Ready |       0.0.4        |           0.0.4          | Exposes certain interface values as Avatar parameters    |
-| HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.14       |          0.1.14          | Provides Heart Rate values as avatar animator parameters |
+| Mod name | More Info                       |   State    | Latest Version Git | Latest Version CVRMG | Description                                                                            |
+| -------- | ------------------------------- | :--------: | :----------------: | :------------------: | -------------------------------------------------------------------------------------- |
+| DataFeed | [README.md](DataFeed/README.md) |   Ready    |       0.4.0        |        0.0.4         | Exposes certain interface values as Avatar parameters and over REST and Websocket APIs |
+| HRtoCVR  | [README.md](HRtoCVR/README.md)  |   Ready    |       0.1.16       |        0.1.14        | Provides Heart Rate values as avatar animator parameters                               |
+| THtoCVR  | [README.md](THtoCVR/README.md)  | PreRelease |       0.0.1        |         N/A          | Temperature and/or humidity sensor info to avatar animator parameters.                 |
 
 ---
 
@@ -184,6 +192,7 @@ Thanks for your assistance with getting started on Mellon Loader Mods
 - VS Code, ide
 - Pre-Commit, linting and error detection
 - Github Copilot, Code error/issue analysis
+- Sonar Qube Cloud, Code error/issue analysis
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -201,3 +210,11 @@ Thanks for your assistance with getting started on Mellon Loader Mods
 [license-url]: https://github.com/NovaVoidHowl/CVR_Mods/blob/master/LICENSE
 [stars-shield]: https://img.shields.io/github/stars/NovaVoidHowl/CVR_Mods.svg?style=plastic
 [stars-url]: https://github.com/NovaVoidHowl/CVR_Mods/stargazers
+[sonarcloud-loc]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=ncloc
+[sonarcloud-bugs]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=bugs
+[sonarcloud-code-smells]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=code_smells
+[sonarcloud-vulnerabilities]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=vulnerabilities
+[sonarcloud-duplicated-lines]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=duplicated_lines_density
+[sonarcloud-reliability]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=reliability_rating
+[sonarcloud-security]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=security_rating
+[sonarcloud-maintainability]: https://sonarcloud.io/api/project_badges/measure?project=NovaVoidHowl_CVR_Mods&metric=sqale_rating

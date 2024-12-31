@@ -460,6 +460,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.HRClients
       Dispose(true);
       GC.SuppressFinalize(this);
     }
+
     ~PulsoidClient()
     {
       Dispose(false);
