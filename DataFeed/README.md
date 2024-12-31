@@ -27,6 +27,7 @@ The following booleans are exposed so that you can react to the current state of
 - dataFeedErrorBBCC - true if the mod is unable to read the BetterBetterCharacterController data set
 - dataFeedErrorMetaPort - true if the mod is unable to read the MetaPort data set
 - dataFeedDisabled - set to true if the whole mod or the avatar parameter output settings are disabled, other wise false
+- dataFeedAPIDisabled - false if the mod's API is enabled, true if the API is disabled or the whole mod is disabled
 
 NOTE: if the `dataFeedDisabled` is true you should disregard the values passed by the other booleans
 
