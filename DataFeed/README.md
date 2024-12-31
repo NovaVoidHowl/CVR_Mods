@@ -39,7 +39,7 @@ NOTE: if the `dataFeedDisabled` is true you should disregard the values passed b
 | :-----------------------------: | :----------------------------------------------------------------------- |
 |             Enable              | Turns the mod on/off                                               |
 | Avatar Parameter Output Enabled | Enables/Disables sending the booleans to the avatar controller variables |
-|           API Enable            | turns on/off the websocket and REST API endpoints                        |
+|           API Enable            | Turns on/off the websocket and REST API endpoints                        |
 |          REST API Port          | The REST API endpoint port on your system                                |
 |       Websocket API Port        | The websocket API endpoint port on your system                           |
 
