@@ -27,17 +27,26 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       // Setup WebSocket server
       wssv = new WebSocketServer($"ws://127.0.0.1:{config.WebSocketPortInt}");
       #region WebSocket API v1
-      var instanceWebSocket = new DataFeedInstanceWebSocketV1(dataFeed);
-      var avatarWebSocket = new DataFeedAvatarWebSocketV1(dataFeed);
-
+      // Create factory methods for all websocket services instead of reusing instances
       wssv.AddWebSocketService("/api/v1/parameters", () => new DataFeedWebSocketParametersV1(dataFeed));
-      wssv.AddWebSocketService("/api/v1/instance", () => instanceWebSocket);
-      wssv.AddWebSocketService("/api/v1/avatar", () => avatarWebSocket);
+      wssv.AddWebSocketService("/api/v1/instance", () => new DataFeedInstanceWebSocketV1(dataFeed));
+      wssv.AddWebSocketService("/api/v1/avatar", () => new DataFeedAvatarWebSocketV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/realtime", () => new DataFeedRealTimeWebSocketV1(dataFeed));
 
-      // Subscribe to the events
-      dataFeed.InstanceChanged += (sender, args) => instanceWebSocket.NotifyClients();
-      dataFeed.AvatarChanged += (sender, args) => avatarWebSocket.NotifyClients();
+      // Subscribe to the events using the broadcast methods of WebSocketServer
+      dataFeed.InstanceChanged += (sender, args) =>
+      {
+        var instanceData = dataFeed.GetCurrentInstanceData();
+        var jsonData = JsonSerializer.Serialize(instanceData);
+        wssv.WebSocketServices["/api/v1/instance"]?.Sessions?.Broadcast(jsonData);
+      };
+
+      dataFeed.AvatarChanged += (sender, args) =>
+      {
+        var avatarData = dataFeed.GetCurrentAvatarData();
+        var jsonData = JsonSerializer.Serialize(avatarData);
+        wssv.WebSocketServices["/api/v1/avatar"]?.Sessions?.Broadcast(jsonData);
+      };
       #endregion // WebSocket API v1
 
       // Setup REST API server with explicit route configuration
@@ -107,7 +116,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         {
           MelonLoader.MelonLogger.Msg("API Endpoints:");
           MelonLoader.MelonLogger.Msg($"REST API: http://127.0.0.1:{config.RestApiPortInt}/api");
-          MelonLoader.MelonLogger.Msg($"WebSocket: ws://127.0.0.1:{config.WebSocketPortInt}/DataFeed");
+          MelonLoader.MelonLogger.Msg($"WebSocket: ws://127.0.0.1:{config.WebSocketPortInt}/api");
         }
       };
     }
