@@ -80,7 +80,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
           nameplatesEnabled = _dataFeed.MetaPortReader.NameplatesEnabled,
           dataFeedErrorBBCC = _dataFeed.BBCCReader.DataFeedErrorBBCC,
           dataFeedErrorMetaPort = _dataFeed.MetaPortReader.DataFeedErrorMetaPort,
-          dataFeedDisabled = _dataFeed.DataFeedDisabled
+          dataFeedDisabled = _dataFeed.DataFeedDisabled,
+          dataFeedAPIDisabled = !_dataFeed.meAPIEnable.Value
         }
       );
     }

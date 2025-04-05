@@ -59,8 +59,13 @@ In addition to the above MellonLoader variables there is `API Key` this is used 
 > first time with the mod installed
 >
 
-For REST API you connect to [http://127.0.0.1:8080/api/state](http://127.0.0.1:8080/), a full list of endpoints will be shown\
-For Websocket API you connect to [ws://127.0.0.1:8081/DataFeed](ws://127.0.0.1:8081/DataFeed)
+For REST API you connect to [http://127.0.0.1:8080/](http://127.0.0.1:8080/), a full list of endpoints will be shown\
+For Websocket API you connect to [ws://127.0.0.1:8081/](ws://127.0.0.1:8081/), note only valid endpoints will return values
+
+> [!TIP]
+>
+> The above ports are the defaults you can change them in the mod's settings
+>
 
 To authenticate to either you use the header `X-API-Key` with the value of that header being the `API Key` value from
 the MellonLoader preferences file in the `DataFeed` section
@@ -74,7 +79,7 @@ the MellonLoader preferences file in the `DataFeed` section
 
 The following are example outputs from the mod's API endpoints
 
-#### Instance
+#### Instance (`/api/v1/instance`)
 
 ```json
 {
@@ -97,7 +102,7 @@ The following are example outputs from the mod's API endpoints
 }
 ```
 
-#### Avatar
+#### Avatar (`/api/v1/avatar`)
 
 ```json
 {
@@ -117,7 +122,7 @@ The following are example outputs from the mod's API endpoints
 }
 ```
 
-#### Parameters
+#### Parameters (`/api/v1/parameters`)
 
 ```json
 {
@@ -131,7 +136,7 @@ The following are example outputs from the mod's API endpoints
 }
 ```
 
-#### Realtime
+#### Realtime (`/api/v1/realtime`)
 
 ```json
 {

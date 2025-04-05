@@ -438,5 +438,29 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         yield return waitTime;
       }
     }
+
+    // Add new methods to get instance and avatar data for API
+    public object GetCurrentInstanceData()
+    {
+      return new
+      {
+        currentInstanceId = MetaPortReader.CurrentInstanceId,
+        currentInstanceName = MetaPortReader.CurrentInstanceName,
+        currentWorldId = MetaPortReader.CurrentWorldId,
+        currentInstancePrivacy = MetaPortReader.CurrentInstancePrivacy,
+        worldDetails = CurrentWorldDetails ?? new WorldAbiApiInfo(),
+        detailsAvailable = CurrentWorldDetails != null
+      };
+    }
+
+    public object GetCurrentAvatarData()
+    {
+      return new
+      {
+        currentAvatarId = CurrentAvatarId,
+        avatarDetails = CurrentAvatarDetails ?? new AvatarAbiApiInfo(),
+        detailsAvailable = CurrentAvatarDetails != null
+      };
+    }
   }
 }
