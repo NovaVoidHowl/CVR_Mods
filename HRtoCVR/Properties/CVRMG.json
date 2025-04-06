@@ -2,14 +2,18 @@
     "_id": 240,
     "name": "HRtoCVR",
     "modversion": "0.1.17",
-    "gameversion": "2024r177",
+    "gameversion": "2025r179",
     "loaderversion": "v0.6.6",
     "modtype": "Mod",
     "author": "NovaVoidHowl",
     "description": "This mod provides Heart Rate values as avatar animator parameters, please see source link for more information.",
-    "searchtags": [ "animator", "parameter", "heart rate" ],
+    "searchtags": [
+        "animator",
+        "parameter",
+        "heart rate"
+    ],
     "requirements": [],
-    "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/HRtoCVR.dll",
+    "downloadlink": "https://api.cvrmg.com/v1/mods/files/240/4/HRtoCVR.dll",
     "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/HRtoCVR",
     "changelog": "Recompiled for 2025r179",
     "embedcolor": "FFBC00"
