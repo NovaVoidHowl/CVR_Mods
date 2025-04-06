@@ -1,7 +1,7 @@
 {
     "_id": 240,
     "name": "HRtoCVR",
-    "modversion": "0.1.17",
+    "modversion": "0.1.18",
     "gameversion": "2025r179",
     "loaderversion": "v0.6.6",
     "modtype": "Mod",
@@ -15,6 +15,6 @@
     "requirements": [],
     "downloadlink": "https://api.cvrmg.com/v1/mods/files/240/4/HRtoCVR.dll",
     "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/HRtoCVR",
-    "changelog": "Recompiled for 2025r179",
+    "changelog": "- Recompiled for 2025r179\n - Fix for settings initial auto save",
     "embedcolor": "FFBC00"
 }

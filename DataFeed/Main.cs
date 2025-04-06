@@ -115,6 +115,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         is_hidden: true // hide the key from the UI to prevent accidental leaks
       );
 
+      // Force save preferences to file so users don't need to change a setting first
+      MelonPreferences.Save();
+
       // Event Listeners MelonLoader
       meEnable.OnEntryValueChanged.Subscribe(
         (oldValue, newValue) =>

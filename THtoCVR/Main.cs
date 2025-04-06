@@ -80,6 +80,9 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
 
       #endregion // Core Mod Options
 
+      // Force save preferences to file so they appear in MelonPreferences.cfg immediately
+      MelonPreferences.Save();
+
       #region  Event Listeners MelonLoader
       meEnable.OnEntryValueChanged.Subscribe(
         (oldValue, newValue) =>
