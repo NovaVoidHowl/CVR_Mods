@@ -3,7 +3,7 @@ using System.Reflection;
 using EmbedIO;
 using EmbedIO.WebApi;
 using EmbedIO.Actions;
-using System.Text.Json;
+using Newtonsoft.Json;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
@@ -37,14 +37,14 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       dataFeed.InstanceChanged += (sender, args) =>
       {
         var instanceData = dataFeed.GetCurrentInstanceData();
-        var jsonData = JsonSerializer.Serialize(instanceData);
+        var jsonData = JsonConvert.SerializeObject(instanceData);
         wssv.WebSocketServices["/api/v1/instance"]?.Sessions?.Broadcast(jsonData);
       };
 
       dataFeed.AvatarChanged += (sender, args) =>
       {
         var avatarData = dataFeed.GetCurrentAvatarData();
-        var jsonData = JsonSerializer.Serialize(avatarData);
+        var jsonData = JsonConvert.SerializeObject(avatarData);
         wssv.WebSocketServices["/api/v1/avatar"]?.Sessions?.Broadcast(jsonData);
       };
       #endregion // WebSocket API v1
@@ -62,7 +62,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
             {
               GeneralHelper.DebugLog($"Request received: {ctx.Request.Url.AbsolutePath}");
               var apiVersions = new { versions = new[] { "v1" } };
-              var json = JsonSerializer.Serialize(apiVersions);
+              var json = JsonConvert.SerializeObject(apiVersions);
               await ctx.SendStringAsync(json, ApiConstants.jsonContentType, System.Text.Encoding.UTF8);
             }
           )
@@ -85,7 +85,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
                 DataFeedWebSocketApiVersion = ApiConstants.WebSocketApiVersion.ToString(),
                 ApiPath = "/api"
               };
-              var json = JsonSerializer.Serialize(info);
+              var json = JsonConvert.SerializeObject(info);
               await ctx.SendStringAsync(json, ApiConstants.jsonContentType, System.Text.Encoding.UTF8);
             }
           )
@@ -103,7 +103,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
             message = "The requested endpoint does not exist.",
             availableEndpoints = ApiConstants.availableRESTEndpoints
           };
-          var json = JsonSerializer.Serialize(errorResponse);
+          var json = JsonConvert.SerializeObject(errorResponse);
           context.Response.ContentType = ApiConstants.jsonContentType;
           await context.SendStringAsync(json, ApiConstants.jsonContentType, System.Text.Encoding.UTF8);
         }
