@@ -1,6 +1,6 @@
 using WebSocketSharp;
 using WebSocketSharp.Server;
-using System.Text.Json;
+using Newtonsoft.Json;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors;
 
@@ -46,7 +46,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     protected abstract string GetConnectionType();
     protected abstract void SendInitialData();
 
-    protected void SendJsonData(object data) => Send(JsonSerializer.Serialize(data));
+    protected void SendJsonData(object data) => Send(JsonConvert.SerializeObject(data));
   }
 
   public class DataFeedWebSocketParametersV1 : DataFeedWebSocketBase

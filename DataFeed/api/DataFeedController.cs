@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Newtonsoft.Json;
 using EmbedIO.WebApi;
 using EmbedIO;
 using EmbedIO.Routing;
@@ -126,7 +126,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     public async Task GetApiV1()
     {
       var endpoints = new { endpoints = ApiConstants.availableRESTEndpoints };
-      var json = JsonSerializer.Serialize(endpoints);
+      var json = JsonConvert.SerializeObject(endpoints);
       await HttpContext.SendStringAsync(json, "application/json", System.Text.Encoding.UTF8);
     }
   }

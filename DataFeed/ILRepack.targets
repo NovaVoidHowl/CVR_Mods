@@ -1,18 +1,165 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Target Name="NotILRepack" AfterTargets="Build">
-        <PropertyGroup>
-            <DoILRepack>false</DoILRepack>
-        </PropertyGroup>
-        <ItemGroup>
-            <!-- Folder with the libraries used that are not supposed to be merged, but are used by our dll -->
-            <IlRepackLibs Include="$(SolutionDir).ManagedLibs\"/>
-            <!-- Our output dll without any dependency embedded -->
-            <InputAssemblies Include="$(OutputPath)$(AssemblyName).dll"/>
-            <!-- Our dll dependencies to be merged, you can add multiple lines, one per dll -->
-            <InputAssemblies Include="$(SolutionDir).ManagedLibs\Rug.Osc.Core.dll"/>
-        </ItemGroup>
-        <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High"/>
-        <ILRepack Internalize="false" LibraryPath="@(IlRepackLibs)" OutputFile="$(OutputPath)$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)"/>
-    </Target>
+
+  <!-- Global properties - set EnableDebugOutput to true to see debug messages -->
+  <PropertyGroup>
+    <EnableDebugOutput>false</EnableDebugOutput>
+  </PropertyGroup>
+
+  <!-- Get DLLs from nuget-->
+  <Target Name="CopyExtraDLLsToExtraLibs" BeforeTargets="BeforeBuild" DependsOnTargets="ResolvePackageAssets">
+    <PropertyGroup>
+      <!-- This is the standard NuGet packages folder for the user -->
+      <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+      <ExtraLibsFolder>$(MSBuildProjectDirectory)\.extra_libs\</ExtraLibsFolder>
+    </PropertyGroup>
+
+    <!-- Extract package versions from project references -->
+    <ItemGroup>
+      <!-- Get the package versions dynamically from resolved packages -->
+      <PackageVersions Include="@(PackageReference)">
+        <Version Condition="'%(PackageReference.Version)' != ''">%(PackageReference.Version)</Version>
+      </PackageVersions>
+
+      <!-- For debugging - log the package versions we found -->
+      <PackagesToLog Include="@(PackageVersions -> '%(Identity): %(Version)')" />
+    </ItemGroup>
+    
+    <!-- Get individual package versions -->
+    <PropertyGroup>
+      <!-- Extract versions for each package we need -->
+      <EmbedIOVersion>@(PackageVersions->WithMetadataValue('Identity', 'EmbedIO')->'%(Version)')</EmbedIOVersion>
+      <WebSocketSharpVersion>@(PackageVersions->WithMetadataValue('Identity', 'WebSocketSharp')->'%(Version)')</WebSocketSharpVersion>
+      <SwanLiteVersion>@(PackageVersions->WithMetadataValue('Identity', 'Unosquare.Swan.Lite')->'%(Version)')</SwanLiteVersion>
+      <ValueTupleVersion>@(PackageVersions->WithMetadataValue('Identity', 'System.ValueTuple')->'%(Version)')</ValueTupleVersion>
+    </PropertyGroup>
+
+    <!-- Debug output to see paths and versions -->
+    <Message Text="DEBUG: NuGetPackageRoot = $(NuGetPackageRoot)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: MSBuildProjectDirectory = $(MSBuildProjectDirectory)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: ExtraLibsFolder = $(ExtraLibsFolder)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: Detected package versions:" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - EmbedIO: $(EmbedIOVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - WebSocketSharp: $(WebSocketSharpVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - Swan.Lite: $(SwanLiteVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - ValueTuple: $(ValueTupleVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+
+    <!-- Create the extra_libs directory if it doesn't exist -->
+    <MakeDir Directories="$(ExtraLibsFolder)" />
+
+    <ItemGroup>
+      <!-- Copy the DLLs from the actual NuGet packages location to the .extra_libs folder -->
+      <!-- Now using dynamic package versions -->
+      <NuGetLibs Include="$(NuGetPackageRoot)embedio\$(EmbedIOVersion)\lib\netstandard2.0\EmbedIO.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)websocketsharp\$(WebSocketSharpVersion)\lib\websocket-sharp.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)unosquare.swan.lite\$(SwanLiteVersion)\lib\netstandard2.0\Swan.Lite.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)system.valuetuple\$(ValueTupleVersion)\lib\net461\System.ValueTuple.dll" />
+    </ItemGroup>
+
+    <Message Text="Copying NuGet DLLs to .extra_libs folder..." Importance="High" />
+    <Copy SourceFiles="@(NuGetLibs)" DestinationFolder="$(ExtraLibsFolder)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+    <Message Text="NuGet DLLs copied to .extra_libs folder." Importance="High" />
+  </Target>
+
+  <!-- Actual ILRepack-->
+  <Target Name="CustomILRepackTarget" AfterTargets="Build">
+    <PropertyGroup>
+      <ExtraLibsFolder>$(MSBuildProjectDirectory)\.extra_libs\</ExtraLibsFolder>
+      <!-- Add debugging output for paths -->
+      <OutputAssemblyPath>$(OutputPath)$(AssemblyName).dll</OutputAssemblyPath>
+    </PropertyGroup>
+    
+    <Message Text="DEBUG: OutputPath = $(OutputPath)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: AssemblyName = $(AssemblyName)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: OutputAssemblyPath = $(OutputAssemblyPath)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    
+    <!-- Get file size before merging in bytes -->
+    <Exec Command="powershell -Command &quot;(Get-Item '$(OutputPath)$(AssemblyName).dll').Length&quot;" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="PreMergeSizeBytes" />
+    </Exec>
+    
+    <!-- Calculate file size in KB -->
+    <PropertyGroup>
+      <PreMergeSize>$([MSBuild]::Divide($(PreMergeSizeBytes), 1024).ToString('0.00'))</PreMergeSize>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <!-- Search paths for assembly resolution -->
+      <IlRepackLibs Include="$(SolutionDir).ManagedLibs\" />
+      <IlRepackLibs Include="$(ExtraLibsFolder)" />
+      <IlRepackLibs Include="$(OutputPath)" />
+      
+      <!-- Our output dll without any dependency embedded -->
+      <InputAssemblies Include="$(OutputPath)$(AssemblyName).dll" />
+      <!-- Our dll dependencies to be merged, with explicit paths -->
+      <InputAssemblies Include="$(ExtraLibsFolder)EmbedIO.dll" />
+      <InputAssemblies Include="$(ExtraLibsFolder)websocket-sharp.dll" />
+      <InputAssemblies Include="$(ExtraLibsFolder)Swan.Lite.dll" />
+      <InputAssemblies Include="$(ExtraLibsFolder)System.ValueTuple.dll" />
+
+      <!-- Define files to be cleaned up after build -->
+      <FilesToCleanup Include="$(OutputPath)EmbedIO.dll" />
+      <FilesToCleanup Include="$(OutputPath)websocket-sharp.dll" />
+      <FilesToCleanup Include="$(OutputPath)Swan.Lite.dll" />
+      <FilesToCleanup Include="$(OutputPath)System.ValueTuple.dll" />
+    </ItemGroup>
+    
+    <!-- Always show basic validation -->
+    <Message Text="=================================" Importance="High"/>
+    <Message Text="| Build Validation" Importance="High" />
+    <Message Text="|- Checking if merged DLLs exist:" Importance="High" />
+    <Message Text="|   |- EmbedIO.dll exists? $([System.IO.File]::Exists('$(ExtraLibsFolder)EmbedIO.dll'))" Importance="High" />
+    <Message Text="|   |- websocket-sharp.dll exists? $([System.IO.File]::Exists('$(ExtraLibsFolder)websocket-sharp.dll'))" Importance="High" />
+    <Message Text="|   |- Swan.Lite.dll exists? $([System.IO.File]::Exists('$(ExtraLibsFolder)Swan.Lite.dll'))" Importance="High" />
+    <Message Text="|   |- System.ValueTuple.dll exists? $([System.IO.File]::Exists('$(ExtraLibsFolder)System.ValueTuple.dll'))" Importance="High" />
+    <Message Text="|- Pre-Merge dll size: $(PreMergeSize) KB" Importance="High" />
+    <Message Text="=================================" Importance="High"/>
+
+    <!-- Debug the full paths being used in ILRepack - only when debugging is enabled -->
+    <Message Text="DEBUG: Full paths of assemblies to merge:" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: @(InputAssemblies->'%(FullPath)')" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: Library search paths:" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: @(IlRepackLibs->'%(FullPath)')" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    
+    <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputPath)$(AssemblyName).dll" Importance="High" />
+    
+    <!-- Use the full explicit paths and specify search directories -->
+    <ILRepack 
+      Internalize="false" 
+      LibraryPath="@(IlRepackLibs)" 
+      OutputFile="$(OutputPath)$(AssemblyName).dll" 
+      InputAssemblies="@(InputAssemblies)" 
+      Parallel="true" 
+      Verbose="$(EnableDebugOutput)" />
+
+    <!-- Get file size after merging in bytes -->
+    <Exec Command="powershell -Command &quot;(Get-Item '$(OutputPath)$(AssemblyName).dll').Length&quot;" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="PostMergeSizeBytes" />
+    </Exec>
+    
+    <!-- Calculate sizes in KB -->
+    <PropertyGroup>
+      <PostMergeSize>$([MSBuild]::Divide($(PostMergeSizeBytes), 1024).ToString('0.00'))</PostMergeSize>
+      <SizeDifferenceBytes>$([MSBuild]::Subtract($(PostMergeSizeBytes), $(PreMergeSizeBytes)))</SizeDifferenceBytes>
+      <SizeDifferenceKB>$([MSBuild]::Divide($(SizeDifferenceBytes), 1024).ToString('0.00'))</SizeDifferenceKB>
+    </PropertyGroup>
+    
+    <Message Text="=================================" Importance="High"/>
+    <Message Text="| Merge Summary" Importance="High" />
+    <Message Text="|- ILRepack completed successfully." Importance="High" />
+    <Message Text="|- Location: $(OutputPath)$(AssemblyName).dll" Importance="High" />
+    <Message Text="|- Pre-Merge Size: $(PreMergeSize) KB" Importance="High" />
+    <Message Text="|- Post-Merge Size: $(PostMergeSize) KB" Importance="High" />
+    <Message Text="|- Size Difference: $(SizeDifferenceKB) KB" Importance="High" />
+    <Message Text="=================================" Importance="High" />
+    
+    <!-- Now clean up the extra DLLs -->
+    <Message Text="Cleaning up extra DLLs from output directory..." Importance="High" />
+    <Delete Files="@(FilesToCleanup)" TreatErrorsAsWarnings="true">
+      <Output TaskParameter="DeletedFiles" ItemName="DeletedList" />
+    </Delete>
+    <Message Text="Deleted files: @(DeletedList->'%(Filename)%(Extension)')" Importance="High" Condition="'@(DeletedList)' != ''" />
+    <Message Text="No files needed to be deleted" Importance="High" Condition="'@(DeletedList)' == ''" />
+    <Message Text="=================================" Importance="High" />
+  </Target>
 </Project>

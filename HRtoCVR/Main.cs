@@ -112,6 +112,9 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
         description: "the rate in seconds at which the file should be read"
       );
 
+      // Force save preferences to file so they appear in MelonPreferences.cfg immediately
+      MelonPreferences.Save();
+
       // Event Listeners MelonLoader
       meEnable.OnEntryValueChanged.Subscribe(
         (oldValue, newValue) =>

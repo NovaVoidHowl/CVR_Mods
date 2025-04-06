@@ -8,3 +8,4 @@ lib_names
 .ManagedLibs/*.db
 lib_names.xml
 /.vs
+/DataFeed/.extra_libs/*.dll
