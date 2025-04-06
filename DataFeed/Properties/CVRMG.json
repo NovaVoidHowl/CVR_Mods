@@ -15,7 +15,7 @@
         "Websocket"
     ],
     "requirements": [],
-    "downloadlink": "https://api.cvrmg.com/v1/mods/files/227/4/DataFeed.dll",
+    "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r5/DataFeed.dll",
     "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
     "changelog": " - Recompiled for CVR 2025r179\n - Fixed for DLL dependency issues\n - Fixed websocket connection issues\n - Fix for settings initial auto save ",
     "embedcolor": "FFBC00"

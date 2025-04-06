@@ -14,7 +14,7 @@
         "Humidity"
     ],
     "requirements": [],
-    "downloadlink": "https://api.cvrmg.com/v1/mods/files/254/1/THtoCVR.dll",
+    "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r5/THtoCVR.dll",
     "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/THtoCVR",
     "changelog": "Initial Release",
     "embedcolor": "FFBC00"
