@@ -1,8 +1,8 @@
 {
     "_id": 227,
     "name": "DataFeed",
-    "modversion": "0.4.2",
-    "gameversion": "2024r177",
+    "modversion": "0.4.5",
+    "gameversion": "2025r179",
     "loaderversion": "v0.6.6",
     "modtype": "Mod",
     "author": "NovaVoidHowl",
@@ -15,8 +15,8 @@
         "Websocket"
     ],
     "requirements": [],
-    "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r3/DataFeed.dll",
+    "downloadlink": "https://api.cvrmg.com/v1/mods/files/227/4/DataFeed.dll",
     "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
-    "changelog": "Recompiled for 2025r179 + fix for websocket reconnection error",
+    "changelog": " - Recompiled for CVR 2025r179\n - Fixed for DLL dependency issues\n - Fixed websocket connection issues",
     "embedcolor": "FFBC00"
 }
