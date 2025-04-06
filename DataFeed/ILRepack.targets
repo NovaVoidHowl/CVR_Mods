@@ -7,28 +7,53 @@
   </PropertyGroup>
 
   <!-- Get DLLs from nuget-->
-  <Target Name="CopyExtraDLLsToExtraLibs" BeforeTargets="BeforeBuild">
+  <Target Name="CopyExtraDLLsToExtraLibs" BeforeTargets="BeforeBuild" DependsOnTargets="ResolvePackageAssets">
     <PropertyGroup>
       <!-- This is the standard NuGet packages folder for the user -->
       <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
       <ExtraLibsFolder>$(MSBuildProjectDirectory)\.extra_libs\</ExtraLibsFolder>
     </PropertyGroup>
 
-    <!-- Debug output to see paths -->
+    <!-- Extract package versions from project references -->
+    <ItemGroup>
+      <!-- Get the package versions dynamically from resolved packages -->
+      <PackageVersions Include="@(PackageReference)">
+        <Version Condition="'%(PackageReference.Version)' != ''">%(PackageReference.Version)</Version>
+      </PackageVersions>
+
+      <!-- For debugging - log the package versions we found -->
+      <PackagesToLog Include="@(PackageVersions -> '%(Identity): %(Version)')" />
+    </ItemGroup>
+    
+    <!-- Get individual package versions -->
+    <PropertyGroup>
+      <!-- Extract versions for each package we need -->
+      <EmbedIOVersion>@(PackageVersions->WithMetadataValue('Identity', 'EmbedIO')->'%(Version)')</EmbedIOVersion>
+      <WebSocketSharpVersion>@(PackageVersions->WithMetadataValue('Identity', 'WebSocketSharp')->'%(Version)')</WebSocketSharpVersion>
+      <SwanLiteVersion>@(PackageVersions->WithMetadataValue('Identity', 'Unosquare.Swan.Lite')->'%(Version)')</SwanLiteVersion>
+      <ValueTupleVersion>@(PackageVersions->WithMetadataValue('Identity', 'System.ValueTuple')->'%(Version)')</ValueTupleVersion>
+    </PropertyGroup>
+
+    <!-- Debug output to see paths and versions -->
     <Message Text="DEBUG: NuGetPackageRoot = $(NuGetPackageRoot)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: MSBuildProjectDirectory = $(MSBuildProjectDirectory)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: ExtraLibsFolder = $(ExtraLibsFolder)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: Detected package versions:" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - EmbedIO: $(EmbedIOVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - WebSocketSharp: $(WebSocketSharpVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - Swan.Lite: $(SwanLiteVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
+    <Message Text="DEBUG: - ValueTuple: $(ValueTupleVersion)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
 
     <!-- Create the extra_libs directory if it doesn't exist -->
     <MakeDir Directories="$(ExtraLibsFolder)" />
 
     <ItemGroup>
       <!-- Copy the DLLs from the actual NuGet packages location to the .extra_libs folder -->
-      <!-- note if you change the versions you will have to update here too -->
-      <NuGetLibs Include="$(NuGetPackageRoot)embedio\3.5.2\lib\netstandard2.0\EmbedIO.dll" />
-      <NuGetLibs Include="$(NuGetPackageRoot)websocketsharp\1.0.3-rc11\lib\websocket-sharp.dll" />
-      <NuGetLibs Include="$(NuGetPackageRoot)unosquare.swan.lite\3.1.0\lib\netstandard2.0\Swan.Lite.dll" />
-      <NuGetLibs Include="$(NuGetPackageRoot)system.valuetuple\4.5.0\lib\net461\System.ValueTuple.dll" />
+      <!-- Now using dynamic package versions -->
+      <NuGetLibs Include="$(NuGetPackageRoot)embedio\$(EmbedIOVersion)\lib\netstandard2.0\EmbedIO.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)websocketsharp\$(WebSocketSharpVersion)\lib\websocket-sharp.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)unosquare.swan.lite\$(SwanLiteVersion)\lib\netstandard2.0\Swan.Lite.dll" />
+      <NuGetLibs Include="$(NuGetPackageRoot)system.valuetuple\$(ValueTupleVersion)\lib\net461\System.ValueTuple.dll" />
     </ItemGroup>
 
     <Message Text="Copying NuGet DLLs to .extra_libs folder..." Importance="High" />
