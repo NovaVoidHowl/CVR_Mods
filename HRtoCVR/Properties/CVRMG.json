@@ -13,8 +13,8 @@
     "heart rate"
   ],
   "requirements": [],
-  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r5/HRtoCVR.dll",
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r6/HRtoCVR.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/HRtoCVR",
-  "changelog": "- Recompiled for 2025r179\n - Fix for settings initial auto save",
+  "changelog": "Recompiled for 2025r180",
   "embedcolor": "FFBC00"
 }
