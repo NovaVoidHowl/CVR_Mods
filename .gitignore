@@ -9,3 +9,4 @@ lib_names
 lib_names.xml
 /.vs
 /DataFeed/.extra_libs/*.dll
+/_local_files
