@@ -26,7 +26,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
 
     private static void SetDefaultParameters()
     {
-      var animator = PlayerSetup.Instance.animatorManager;
+      var animator = PlayerSetup.Instance.AnimatorManager;
       // main data feed
       animator.SetParameter("flyingAllowed", true);
       animator.SetParameter("propsAllowed", true);
@@ -46,7 +46,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       PlatformStateParameters platformState
     )
     {
-      var animator = PlayerSetup.Instance.animatorManager;
+      var animator = PlayerSetup.Instance.AnimatorManager;
 
       // World rules - these parameter names match existing avatar implementations
       animator.SetParameter("flyingAllowed", worldRules.FlyingAllowed);

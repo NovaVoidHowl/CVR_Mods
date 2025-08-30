@@ -140,9 +140,33 @@ The following are example outputs from the mod's API endpoints
 
 ```json
 {
-    "currentPing": 22
+    "currentPing": 22,
+    "isConnected": true,
+    "connectionState": "Connected",
+    "dataFeedErrorNetworkManager": false
 }
 ```
+
+### WebSocket Real-time Data
+
+The WebSocket endpoint (`ws://127.0.0.1:8081/`) sends real-time updates every second with the same format as the
+REST realtime endpoint:
+
+```json
+{
+    "currentPing": 22,
+    "isConnected": true,
+    "connectionState": "Connected",
+    "dataFeedErrorNetworkManager": false
+}
+```
+
+Where:
+
+- `currentPing`: Network latency to the game server in milliseconds
+- `isConnected`: Boolean indicating if connected to the game server  
+- `connectionState`: String representation of the connection state (e.g., "Connected", "Disconnected", "Connecting")
+- `dataFeedErrorNetworkManager`: Boolean indicating if there was an error reading NetworkManager data
 
 ## Future goals
 

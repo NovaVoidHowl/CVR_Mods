@@ -23,8 +23,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     };
 
     // API version constants
-    public static readonly Version RestApiVersion = new Version(1, 0, 0);
-    public static readonly Version WebSocketApiVersion = new Version(1, 0, 0);
+    public static readonly Version RestApiVersion = new Version(1, 1, 0);
+    public static readonly Version WebSocketApiVersion = new Version(1, 1, 0);
 
     // Use System.Version to parse the version string
     public static readonly Version ModVersion = new Version(AssemblyInfoParams.Version);

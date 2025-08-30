@@ -185,7 +185,13 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     {
       while (_isRunning)
       {
-        SendJsonData(new { currentPing = _dataFeed.MetaPortReader.CurrentPing });
+        SendJsonData(new
+        {
+          currentPing = _dataFeed.NetworkManagerReader.GameNetworkPing,
+          isConnected = _dataFeed.NetworkManagerReader.IsConnected,
+          connectionState = _dataFeed.NetworkManagerReader.ConnectionState,
+          dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager
+        });
         await Task.Delay(1000);
       }
     }

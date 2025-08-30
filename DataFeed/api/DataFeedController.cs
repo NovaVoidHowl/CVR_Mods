@@ -115,7 +115,13 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         return new { error = ApiConstants.ApiKeyInvalidError };
       }
 
-      var realTimeData = new { currentPing = _dataFeed.MetaPortReader.CurrentPing };
+      var realTimeData = new
+      {
+        currentPing = _dataFeed.NetworkManagerReader.GameNetworkPing,
+        isConnected = _dataFeed.NetworkManagerReader.IsConnected,
+        connectionState = _dataFeed.NetworkManagerReader.ConnectionState,
+        dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager
+      };
 
       GeneralHelper.DebugLog("Real-time data retrieved successfully.");
       Response.ContentType = ApiConstants.jsonContentType;

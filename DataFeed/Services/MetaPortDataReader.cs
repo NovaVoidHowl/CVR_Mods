@@ -11,7 +11,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
     private string _currentInstancePrivacy;
     private int _buildId;
     private string _hardwareId;
-    private int _currentPing;
     private bool _propsAllowed;
     private bool _portalsAllowed;
     private bool _nameplatesEnabled;
@@ -23,7 +22,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
     public string CurrentInstancePrivacy => _currentInstancePrivacy;
     public int BuildId => _buildId;
     public string HardwareId => _hardwareId;
-    public int CurrentPing => _currentPing;
     public bool PropsAllowed => _propsAllowed;
     public bool PortalsAllowed => _portalsAllowed;
     public bool NameplatesEnabled => _nameplatesEnabled;
@@ -46,7 +44,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
 
       _buildId = metaPort.buildId;
       _hardwareId = metaPort.hardwareId;
-      _currentPing = metaPort.currentPing;
       _dataFeedErrorMetaPort = false;
 
       return stateChanged;

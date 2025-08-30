@@ -12,7 +12,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Interfaces
     string CurrentInstancePrivacy { get; }
     int BuildId { get; }
     string HardwareId { get; }
-    int CurrentPing { get; }
 
     bool PropsAllowed { get; }
     bool PortalsAllowed { get; }

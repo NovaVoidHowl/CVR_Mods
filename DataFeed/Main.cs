@@ -58,22 +58,27 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public ApiConfig ApiConfig => apiConfig;
 
     private readonly object _stateLock = new object();
-    private bool _isQuitting;
 
     private readonly IMetaPortDataReader _metaPortReader;
     private readonly IAvatarParameterManager _avatarParameterManager;
     private readonly IBetterBetterCharacterControllerDataReader _bbccReader;
+    private readonly INetworkManagerDataReader _networkManagerReader;
+
+    // Network update throttling (similar to game menu)
+    private float _timeLastNetworkUpdate = 0f;
 
     public DataFeed()
     {
       _metaPortReader = new MetaPortDataReader();
       _avatarParameterManager = new AvatarParameterManager();
       _bbccReader = new BetterBetterCharacterControllerDataReader();
+      _networkManagerReader = new NetworkManagerDataReader();
     }
 
     // Expose the interface readers
     public IMetaPortDataReader MetaPortReader => _metaPortReader;
     public IBetterBetterCharacterControllerDataReader BBCCReader => _bbccReader;
+    public INetworkManagerDataReader NetworkManagerReader => _networkManagerReader;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -181,7 +186,18 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       }
       #endregion // api init
 
-      MelonCoroutines.Start(UpdatePingCoroutine());
+      // Note: Ping updates are now handled by NetworkManagerReader in the main update loop
+    }
+
+    // Update network status continuously (similar to how the game menu does it)
+    public override void OnUpdate()
+    {
+      // Only update network status, not the full data feed (to avoid performance issues)
+      if (meEnable.Value && Time.time - _timeLastNetworkUpdate > 0.5f) // Update every 0.5 seconds
+      {
+        _networkManagerReader.UpdateNetworkManagerState();
+        _timeLastNetworkUpdate = Time.time;
+      }
     }
 
     private void OnMeEnableChanged(bool oldValue, bool newValue)
@@ -365,6 +381,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       var stateChanged = false;
       stateChanged |= _bbccReader.UpdateBBCCState();
       stateChanged |= _metaPortReader.UpdateMetaPortState();
+      stateChanged |= _networkManagerReader.UpdateNetworkManagerState();
 
       if (stateChanged)
       {
@@ -412,7 +429,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     {
       // any on quit code here, ie closing connections etc
 
-      _isQuitting = true;
       apiServer?.Stop();
     }
 
@@ -429,17 +445,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     protected virtual void OnInstanceChanged()
     {
       InstanceChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    private IEnumerator UpdatePingCoroutine()
-    {
-      // This can be removed as ping updates are now handled by MetaPortReader
-      var waitTime = new WaitForSeconds(1f);
-      while (!_isQuitting)
-      {
-        _metaPortReader.UpdateMetaPortState();
-        yield return waitTime;
-      }
     }
 
     // Add new methods to get instance and avatar data for API
