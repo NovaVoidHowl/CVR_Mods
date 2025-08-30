@@ -31,7 +31,17 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 
     private bool ValidateApiKey()
     {
+      // Try to get API key from headers first (for non-browser clients)
       var apiKey = Context.Headers[ApiConstants.ApiKeyHeader];
+      
+      // If not found in headers, try query string (for browser WebSocket connections)
+      if (string.IsNullOrEmpty(apiKey))
+      {
+        var uri = Context.RequestUri;
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        apiKey = query["api-key"] ?? query["apikey"];
+      }
+      
       var configKey = _dataFeed.ApiConfig.ApiKey;
 
       if (!ApiHelper.IsValidApiKey(apiKey, configKey))
@@ -190,10 +200,43 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
           currentPing = _dataFeed.NetworkManagerReader.GameNetworkPing,
           isConnected = _dataFeed.NetworkManagerReader.IsConnected,
           connectionState = _dataFeed.NetworkManagerReader.ConnectionState,
-          dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager
+          dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager,
+          currentFPS = _dataFeed.FPSReader.CurrentFPS,
+          voiceCommsPing = _dataFeed.CommsReader.VoiceCommsPing,
+          isVoiceConnected = _dataFeed.CommsReader.IsVoiceConnected,
+          voiceConnectionState = _dataFeed.CommsReader.VoiceConnectionState,
+          dataFeedErrorComms = _dataFeed.CommsReader.DataFeedErrorComms
         });
         await Task.Delay(1000);
       }
+    }
+  }
+
+  public class DataFeedWorldWebSocketV1 : DataFeedWebSocketBase
+  {
+    public DataFeedWorldWebSocketV1(DataFeed dataFeed)
+      : base(dataFeed) { }
+
+    protected override string GetConnectionType() => "world";
+
+    protected override void SendInitialData() => SendCurrentWorldData();
+
+    private void SendCurrentWorldData()
+    {
+      SendJsonData(
+        new
+        {
+          currentWorldId = _dataFeed.CurrentWorldId,
+          worldDetails = _dataFeed.CurrentWorldDetails ?? new WorldAbiApiInfo(),
+          detailsAvailable = _dataFeed.CurrentWorldDetails != null
+        }
+      );
+    }
+
+    protected override void OnMessage(MessageEventArgs e)
+    {
+      if (e.Data == "get_world")
+        SendCurrentWorldData();
     }
   }
 }

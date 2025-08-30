@@ -63,6 +63,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     private readonly IAvatarParameterManager _avatarParameterManager;
     private readonly IBetterBetterCharacterControllerDataReader _bbccReader;
     private readonly INetworkManagerDataReader _networkManagerReader;
+    private readonly ICommsDataReader _commsReader;
+    private readonly IFPSDataReader _fpsReader;
 
     // Network update throttling (similar to game menu)
     private float _timeLastNetworkUpdate = 0f;
@@ -73,12 +75,16 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       _avatarParameterManager = new AvatarParameterManager();
       _bbccReader = new BetterBetterCharacterControllerDataReader();
       _networkManagerReader = new NetworkManagerDataReader();
+      _commsReader = new CommsDataReader();
+      _fpsReader = new FPSDataReader();
     }
 
     // Expose the interface readers
     public IMetaPortDataReader MetaPortReader => _metaPortReader;
     public IBetterBetterCharacterControllerDataReader BBCCReader => _bbccReader;
     public INetworkManagerDataReader NetworkManagerReader => _networkManagerReader;
+    public ICommsDataReader CommsReader => _commsReader;
+    public IFPSDataReader FPSReader => _fpsReader;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -196,6 +202,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       if (meEnable.Value && Time.time - _timeLastNetworkUpdate > 0.5f) // Update every 0.5 seconds
       {
         _networkManagerReader.UpdateNetworkManagerState();
+        _commsReader.UpdateCommsState();
+        _fpsReader.UpdateFPS();
         _timeLastNetworkUpdate = Time.time;
       }
     }
@@ -300,6 +308,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
     private async void OnInstanceConnected(string message)
     {
+      // Update MetaPort data immediately to get current world information
+      _metaPortReader.UpdateInstanceInfo();
+      
       string worldId = _metaPortReader.CurrentWorldId;
       WorldAbiApiInfo worldDetails = null;
 

@@ -31,6 +31,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       wssv.AddWebSocketService("/api/v1/parameters", () => new DataFeedWebSocketParametersV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/instance", () => new DataFeedInstanceWebSocketV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/avatar", () => new DataFeedAvatarWebSocketV1(dataFeed));
+      wssv.AddWebSocketService("/api/v1/world", () => new DataFeedWorldWebSocketV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/realtime", () => new DataFeedRealTimeWebSocketV1(dataFeed));
 
       // Subscribe to the events using the broadcast methods of WebSocketServer
@@ -47,6 +48,20 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         var jsonData = JsonConvert.SerializeObject(avatarData);
         wssv.WebSocketServices["/api/v1/avatar"]?.Sessions?.Broadcast(jsonData);
       };
+
+      // Add world changed event handler if it doesn't exist yet
+      // Note: You may need to add this event to the DataFeed class if it doesn't exist
+      // dataFeed.WorldChanged += (sender, args) =>
+      // {
+      //   var worldData = new
+      //   {
+      //     currentWorldId = dataFeed.CurrentWorldId,
+      //     worldDetails = dataFeed.CurrentWorldDetails ?? new WorldAbiApiInfo(),
+      //     detailsAvailable = dataFeed.CurrentWorldDetails != null
+      //   };
+      //   var jsonData = JsonConvert.SerializeObject(worldData);
+      //   wssv.WebSocketServices["/api/v1/world"]?.Sessions?.Broadcast(jsonData);
+      // };
       #endregion // WebSocket API v1
 
       // Setup REST API server with explicit route configuration

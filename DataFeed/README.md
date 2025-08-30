@@ -122,6 +122,35 @@ The following are example outputs from the mod's API endpoints
 }
 ```
 
+#### World (`/api/v1/world`)
+
+```json
+{
+    "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
+    "worldDetails": {
+        "Tags": [],
+        "CompatibilityVersion": 2,
+        "Platform": 0,
+        "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
+        "AuthorName": "ChilloutVR",
+        "Name": "ChilloutVR Hub",
+        "UploadedAt": "2020-04-06T20:50:25",
+        "UpdatedAt": "2024-03-27T02:23:12",
+        "Categories": [],
+        "FileSize": 44292857,
+        "ImageUrl": "https://api.abinteractive.net/1/images/501e2584-ce9a-4570-8c28-ef496e033f5f"
+    },
+    "detailsAvailable": true
+}
+```
+
+> [!NOTE]
+>
+> The World endpoint provides detailed information about the current world when available through the ChilloutVR API.
+> If `detailsAvailable` is `false`, the `worldDetails` object will contain mostly null values, and you should fall back
+> to using the instance information from the Instance endpoint.
+>
+
 #### Parameters (`/api/v1/parameters`)
 
 ```json
@@ -143,9 +172,27 @@ The following are example outputs from the mod's API endpoints
     "currentPing": 22,
     "isConnected": true,
     "connectionState": "Connected",
-    "dataFeedErrorNetworkManager": false
+    "dataFeedErrorNetworkManager": false,
+    "currentFPS": 60,
+    "voiceCommsPing": 15
 }
 ```
+
+### WebSocket Endpoints
+
+The WebSocket API provides several endpoints for different types of data:
+
+- `/api/v1/parameters` - World parameter states (props allowed, flying allowed, etc.)
+- `/api/v1/instance` - Current instance information (updated when switching worlds/instances)
+- `/api/v1/avatar` - Current avatar information (updated when switching avatars)
+- `/api/v1/world` - Current world details from ChilloutVR API (updated when switching worlds)
+- `/api/v1/realtime` - Real-time data updates (ping, FPS, connection status)
+
+> [!TIP]
+>
+> For real-time monitoring applications, use `/api/v1/realtime` which updates every second.
+> For static information that changes less frequently, use the specific endpoints like `/api/v1/world` or `/api/v1/avatar`.
+>
 
 ### WebSocket Real-time Data
 
@@ -157,7 +204,9 @@ REST realtime endpoint:
     "currentPing": 22,
     "isConnected": true,
     "connectionState": "Connected",
-    "dataFeedErrorNetworkManager": false
+    "dataFeedErrorNetworkManager": false,
+    "currentFPS": 60,
+    "voiceCommsPing": 15
 }
 ```
 
@@ -167,6 +216,8 @@ Where:
 - `isConnected`: Boolean indicating if connected to the game server  
 - `connectionState`: String representation of the connection state (e.g., "Connected", "Disconnected", "Connecting")
 - `dataFeedErrorNetworkManager`: Boolean indicating if there was an error reading NetworkManager data
+- `currentFPS`: Current frames per second of the game
+- `voiceCommsPing`: Voice communications latency in milliseconds (currently returns 0)
 
 ## Future goals
 
