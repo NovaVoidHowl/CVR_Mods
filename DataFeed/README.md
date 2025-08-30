@@ -218,6 +218,34 @@ Where:
 - `currentFPS`: Current frames per second of the game
 - `voiceCommsPing`: Voice communications latency in milliseconds (currently returns 0)
 
+## Example Usage: OBS Overlay
+
+Want to see the DataFeed mod in action? Check out the **CVR Data Feed OBS Overlay** - a real-time streaming overlay
+that demonstrates how to use both the REST API and WebSocket endpoints together:
+
+🔗 **[CVR-DataFeed-OBS-Overlay](https://github.com/NovaVoidHowl/CVR-DataFeed-OBS-Overlay)**
+
+### What it does
+
+- **Real-time Network Display**: Shows game ping, FPS, and connection status using the WebSocket `/api/v1/realtime`
+  endpoint
+- **World Information Panel**: Displays current world name, author etc. via the REST `/api/v1/instance`
+  endpoint  
+- **Avatar Information Panel**: Shows current avatar details and tags using the REST `/api/v1/avatar` endpoint
+- **Auto-reconnection**: Handles connection drops gracefully and reconnects automatically
+- **OBS Integration**: Ready-to-use browser source overlay for streamers
+
+### Key Features
+
+- **Hybrid Data Approach**: Combines WebSocket for live data (ping, FPS) with REST API calls for static information
+  (world/avatar details)
+- **Visual Indicators**: Connection status and data freshness indicators
+- **Responsive Design**: Scales appropriately for different stream resolutions
+- **Easy Setup**: Simple configuration with your DataFeed API key
+
+This example showcases the practical applications of the DataFeed mod's API and serves as a reference implementation
+for developers looking to integrate ChilloutVR data into their own applications.
+
 ## Future goals
 
 Add OSC output for external apps to read from
