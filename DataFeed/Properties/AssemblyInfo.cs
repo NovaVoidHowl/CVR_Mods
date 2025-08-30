@@ -19,7 +19,7 @@ using MelonLoader;
 [assembly: MelonGame(null, "ChilloutVR")]
 [assembly: MelonPlatform(MelonPlatformAttribute.CompatiblePlatforms.WINDOWS_X64)]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.MONO)]
-[assembly: VerifyLoaderVersion(0, 6, 6, true)]
+[assembly: VerifyLoaderVersion(0, 7, 0, true)]
 [assembly: MelonColor(255, 255, 188, 0)]
 [assembly: MelonAuthorColor(255, 95, 95, 255)]
 [assembly: MelonIncompatibleAssemblies(AssemblyInfoParams.CVRParamLibName)]
