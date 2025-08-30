@@ -137,8 +137,7 @@ The following are example outputs from the mod's API endpoints
         "UploadedAt": "2020-04-06T20:50:25",
         "UpdatedAt": "2024-03-27T02:23:12",
         "Categories": [],
-        "FileSize": 44292857,
-        "ImageUrl": "https://api.abinteractive.net/1/images/501e2584-ce9a-4570-8c28-ef496e033f5f"
+        "FileSize": 44292857
     },
     "detailsAvailable": true
 }
