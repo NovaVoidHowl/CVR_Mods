@@ -49,19 +49,6 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         wssv.WebSocketServices["/api/v1/avatar"]?.Sessions?.Broadcast(jsonData);
       };
 
-      // Add world changed event handler if it doesn't exist yet
-      // Note: You may need to add this event to the DataFeed class if it doesn't exist
-      // dataFeed.WorldChanged += (sender, args) =>
-      // {
-      //   var worldData = new
-      //   {
-      //     currentWorldId = dataFeed.CurrentWorldId,
-      //     worldDetails = dataFeed.CurrentWorldDetails ?? new WorldAbiApiInfo(),
-      //     detailsAvailable = dataFeed.CurrentWorldDetails != null
-      //   };
-      //   var jsonData = JsonConvert.SerializeObject(worldData);
-      //   wssv.WebSocketServices["/api/v1/world"]?.Sessions?.Broadcast(jsonData);
-      // };
       #endregion // WebSocket API v1
 
       // Setup REST API server with explicit route configuration

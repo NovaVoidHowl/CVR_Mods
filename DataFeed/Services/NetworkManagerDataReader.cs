@@ -38,7 +38,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
         // Check if GameNetwork.Client is available (more reliable than just ConnectionState)
         var gameNetwork = networkManager.GameNetwork;
         var gameNetworkClient = gameNetwork?.Client;
-        
+
         if (gameNetworkClient == null)
         {
           // No client means definitely not connected
@@ -55,7 +55,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
           var currentConnectionState = gameNetwork.ConnectionState;
           var currentConnectionStateString = currentConnectionState.ToString();
           var currentIsConnected = currentConnectionStateString == "Connected";
-          
+
           stateChanged |= _connectionState != currentConnectionStateString;
           _connectionState = currentConnectionStateString;
           stateChanged |= _isConnected != currentIsConnected;
@@ -74,7 +74,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
               currentPing = 0;
             }
           }
-          
+
           stateChanged |= _gameNetworkPing != currentPing;
           _gameNetworkPing = currentPing;
         }

@@ -13,13 +13,13 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
     {
       // Calculate FPS using the same method as the game menu
       var currentFPS = (int)Mathf.Floor(1f / Time.deltaTime);
-      
+
       if (_currentFPS != currentFPS)
       {
         _currentFPS = currentFPS;
         return true;
       }
-      
+
       return false;
     }
   }

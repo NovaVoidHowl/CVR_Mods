@@ -33,7 +33,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     {
       // Try to get API key from headers first (for non-browser clients)
       var apiKey = Context.Headers[ApiConstants.ApiKeyHeader];
-      
+
       // If not found in headers, try query string (for browser WebSocket connections)
       if (string.IsNullOrEmpty(apiKey))
       {
@@ -41,7 +41,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
         apiKey = query["api-key"] ?? query["apikey"];
       }
-      
+
       var configKey = _dataFeed.ApiConfig.ApiKey;
 
       if (!ApiHelper.IsValidApiKey(apiKey, configKey))
@@ -195,18 +195,20 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     {
       while (_isRunning)
       {
-        SendJsonData(new
-        {
-          currentPing = _dataFeed.NetworkManagerReader.GameNetworkPing,
-          isConnected = _dataFeed.NetworkManagerReader.IsConnected,
-          connectionState = _dataFeed.NetworkManagerReader.ConnectionState,
-          dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager,
-          currentFPS = _dataFeed.FPSReader.CurrentFPS,
-          voiceCommsPing = _dataFeed.CommsReader.VoiceCommsPing,
-          isVoiceConnected = _dataFeed.CommsReader.IsVoiceConnected,
-          voiceConnectionState = _dataFeed.CommsReader.VoiceConnectionState,
-          dataFeedErrorComms = _dataFeed.CommsReader.DataFeedErrorComms
-        });
+        SendJsonData(
+          new
+          {
+            currentPing = _dataFeed.NetworkManagerReader.GameNetworkPing,
+            isConnected = _dataFeed.NetworkManagerReader.IsConnected,
+            connectionState = _dataFeed.NetworkManagerReader.ConnectionState,
+            dataFeedErrorNetworkManager = _dataFeed.NetworkManagerReader.DataFeedErrorNetworkManager,
+            currentFPS = _dataFeed.FPSReader.CurrentFPS,
+            voiceCommsPing = _dataFeed.CommsReader.VoiceCommsPing,
+            isVoiceConnected = _dataFeed.CommsReader.IsVoiceConnected,
+            voiceConnectionState = _dataFeed.CommsReader.VoiceConnectionState,
+            dataFeedErrorComms = _dataFeed.CommsReader.DataFeedErrorComms
+          }
+        );
         await Task.Delay(1000);
       }
     }

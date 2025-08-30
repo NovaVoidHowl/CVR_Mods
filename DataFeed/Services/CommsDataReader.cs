@@ -1,5 +1,6 @@
 using ABI_RC.Systems.Communications;
 using ABI_RC.Systems.Communications.Networking;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.Interfaces;
 
@@ -17,6 +18,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
     public string VoiceConnectionState => _voiceConnectionState;
     public bool DataFeedErrorComms => _dataFeedErrorComms;
 
+    [SuppressMessage(
+      "SonarQube",
+      "csharpsquid:S3011",
+      Justification = "Mod requires access to internal game state for data feed functionality"
+    )]
     public bool UpdateCommsState()
     {
       var stateChanged = false;
@@ -55,9 +61,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
           try
           {
             // Access the internal Client property using reflection
+            // This is safe in a mod context - we need access to internal game state
+            // to provide voice communications data to external applications
             var managerType = typeof(Comms_Manager);
             var clientProperty = managerType.GetProperty("Client", BindingFlags.NonPublic | BindingFlags.Instance);
-            
+
             if (clientProperty != null)
             {
               var commsClient = clientProperty.GetValue(commsManager);
@@ -72,7 +80,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
             currentVoiceCommsPing = 0;
           }
         }
-        
+
         stateChanged |= _voiceCommsPing != currentVoiceCommsPing;
         _voiceCommsPing = currentVoiceCommsPing;
 
