@@ -24,19 +24,19 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
       bool resetToDefault = false
     )
     {
-      PlayerSetup.Instance.animatorManager.SetParameter("HRtoCVRDisabled", HRtoCVRDisabled);
+      PlayerSetup.Instance.AnimatorManager.SetParameter("HRtoCVRDisabled", HRtoCVRDisabled);
 
       if (resetToDefault)
       {
         MelonLogger.Msg("Reset triggered, restoring HR parameters to default");
-        PlayerSetup.Instance.animatorManager.SetParameter(onesHRParam, 0);
-        PlayerSetup.Instance.animatorManager.SetParameter(tensHRParam, 0);
-        PlayerSetup.Instance.animatorManager.SetParameter(hundredsHRParam, 0);
-        PlayerSetup.Instance.animatorManager.SetParameter(isHRConnectedParam, false);
-        PlayerSetup.Instance.animatorManager.SetParameter(isHRActiveParam, false);
-        PlayerSetup.Instance.animatorManager.SetParameter(HRPercentParam, 0);
-        PlayerSetup.Instance.animatorManager.SetParameter(HRParam, 0);
-        PlayerSetup.Instance.animatorManager.SetParameter(isHRBeatParam, false);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(onesHRParam, 0);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(tensHRParam, 0);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(hundredsHRParam, 0);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(isHRConnectedParam, false);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(isHRActiveParam, false);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(HRPercentParam, 0);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(HRParam, 0);
+        PlayerSetup.Instance.AnimatorManager.SetParameter(isHRBeatParam, false);
         return;
       }
 
@@ -45,38 +45,38 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
         case HRtoCVR.HRConnectionType.Pulsoid:
           if (pulsoidClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(onesHRParam, pulsoidClient.onesHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(tensHRParam, pulsoidClient.tensHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(hundredsHRParam, pulsoidClient.hundredsHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRConnectedParam, pulsoidClient.isHRConnected);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRActiveParam, pulsoidClient.isHRActive);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRPercentParam, pulsoidClient.HRPercent);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRParam, pulsoidClient.HR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(onesHRParam, pulsoidClient.onesHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(tensHRParam, pulsoidClient.tensHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(hundredsHRParam, pulsoidClient.hundredsHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRConnectedParam, pulsoidClient.isHRConnected);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRActiveParam, pulsoidClient.isHRActive);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRPercentParam, pulsoidClient.HRPercent);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRParam, pulsoidClient.HR);
           }
           break;
         case HRtoCVR.HRConnectionType.Simulated:
           if (simulatedClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(onesHRParam, simulatedClient.onesHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(tensHRParam, simulatedClient.tensHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(hundredsHRParam, simulatedClient.hundredsHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRConnectedParam, simulatedClient.isHRConnected);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRActiveParam, simulatedClient.isHRActive);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRPercentParam, simulatedClient.HRPercent);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRParam, simulatedClient.HR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(onesHRParam, simulatedClient.onesHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(tensHRParam, simulatedClient.tensHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(hundredsHRParam, simulatedClient.hundredsHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRConnectedParam, simulatedClient.isHRConnected);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRActiveParam, simulatedClient.isHRActive);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRPercentParam, simulatedClient.HRPercent);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRParam, simulatedClient.HR);
           }
           break;
 
         case HRtoCVR.HRConnectionType.TextFile:
           if (textFileClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(onesHRParam, textFileClient.onesHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(tensHRParam, textFileClient.tensHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(hundredsHRParam, textFileClient.hundredsHR);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRConnectedParam, textFileClient.isHRConnected);
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRActiveParam, textFileClient.isHRActive);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRPercentParam, textFileClient.HRPercent);
-            PlayerSetup.Instance.animatorManager.SetParameter(HRParam, textFileClient.HR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(onesHRParam, textFileClient.onesHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(tensHRParam, textFileClient.tensHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(hundredsHRParam, textFileClient.hundredsHR);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRConnectedParam, textFileClient.isHRConnected);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRActiveParam, textFileClient.isHRActive);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRPercentParam, textFileClient.HRPercent);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(HRParam, textFileClient.HR);
           }
           break;
       }
@@ -94,20 +94,20 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR
         case HRtoCVR.HRConnectionType.Pulsoid:
           if (pulsoidClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRBeatParam, pulsoidClient.isHRBeat);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRBeatParam, pulsoidClient.isHRBeat);
           }
           break;
         case HRtoCVR.HRConnectionType.Simulated:
           if (simulatedClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRBeatParam, simulatedClient.isHRBeat);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRBeatParam, simulatedClient.isHRBeat);
           }
           break;
 
         case HRtoCVR.HRConnectionType.TextFile:
           if (textFileClient != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(isHRBeatParam, textFileClient.isHRBeat);
+            PlayerSetup.Instance.AnimatorManager.SetParameter(isHRBeatParam, textFileClient.isHRBeat);
           }
           break;
       }

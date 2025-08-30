@@ -338,16 +338,16 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
           VerboseMelonLogger.Msg($"Temperature: {temperatureData.Value}", verboseParametersLogging);
 
           // Update the animator parameter
-          if (PlayerSetup.Instance?.animatorManager != null)
+          if (PlayerSetup.Instance?.AnimatorManager != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(
+            PlayerSetup.Instance.AnimatorManager.SetParameter(
               connection.TemperatureEndpointAnimatorParameter,
               float.Parse(temperatureData.Value)
             );
           }
           else
           {
-            VerboseMelonLogger.Error("PlayerSetup.Instance or animatorManager is null.", verboseLogging);
+            VerboseMelonLogger.Error("PlayerSetup.Instance or AnimatorManager is null.", verboseLogging);
           }
         }
       }
@@ -378,16 +378,16 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
           VerboseMelonLogger.Msg($"Humidity: {humidityData.Value}", verboseParametersLogging);
 
           // Update the animator parameter
-          if (PlayerSetup.Instance?.animatorManager != null)
+          if (PlayerSetup.Instance?.AnimatorManager != null)
           {
-            PlayerSetup.Instance.animatorManager.SetParameter(
+            PlayerSetup.Instance.AnimatorManager.SetParameter(
               connection.HumidityEndpointAnimatorParameter,
               float.Parse(humidityData.Value)
             );
           }
           else
           {
-            VerboseMelonLogger.Error("PlayerSetup.Instance or animatorManager is null.", verboseLogging);
+            VerboseMelonLogger.Error("PlayerSetup.Instance or AnimatorManager is null.", verboseLogging);
           }
         }
       }
@@ -404,7 +404,7 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
     // function to send THtoCVRDisabled to the animator
     private void SendTHtoCVRDisabledToAnimator()
     {
-      PlayerSetup.Instance.animatorManager.SetParameter("THtoCVRDisabled", THtoCVRDisabled ? 1 : 0);
+      PlayerSetup.Instance.AnimatorManager.SetParameter("THtoCVRDisabled", THtoCVRDisabled ? 1 : 0);
     }
 
     public void Cleanup()
