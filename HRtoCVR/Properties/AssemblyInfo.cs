@@ -16,7 +16,7 @@ using MelonLoader;
   AssemblyInfoParams.Author,
   downloadLink: "https://github.com/NovaVoidHowl/CVR_Mods"
 )]
-[assembly: MelonGame("Alpha Blend Interactive", "ChilloutVR")]
+[assembly: MelonGame(null, "ChilloutVR")]
 [assembly: MelonPlatform(MelonPlatformAttribute.CompatiblePlatforms.WINDOWS_X64)]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.MONO)]
 [assembly: VerifyLoaderVersion(0, 6, 6, true)]
@@ -28,7 +28,7 @@ namespace uk.novavoidhowl.dev.cvrmods.HRtoCVR.Properties;
 
 internal static class AssemblyInfoParams
 {
-  public const string Version = "0.1.18";
+  public const string Version = "0.1.19";
   public const string Author = "NovaVoidHowl";
   public const string CVRParamLibName = "CVRParamLib";
 }
