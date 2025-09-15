@@ -77,10 +77,12 @@ Welcome to my little collection of mods for [ChilloutVR](https://abinteractive.n
 feel free to leave bug reports or feature requests!
 
 > [!NOTE]
->
-> This project is an independent creation and is not affiliated with, supported by, or approved by Alpha Blend
-> Interactive
->
+> These modifications are unofficial and not supported by ChilloutVR or the ChilloutVR team.\
+> Using this modification _might_ cause issues with performance, security or stability of the game.
+
+> [!TIP]
+> Should you wish to review the source code of these mods and compile them yourself please note that this project
+> is setup for use with Visual Studio 2022 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- MOD LIST -->
