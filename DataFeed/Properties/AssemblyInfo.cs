@@ -28,7 +28,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Properties;
 
 internal static class AssemblyInfoParams
 {
-  public const string Version = "0.8.0";
+  public const string Version = "0.9.0";
   public const string Author = "NovaVoidHowl";
   public const string CVRParamLibName = "CVRParamLib";
 }

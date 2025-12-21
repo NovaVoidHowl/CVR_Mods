@@ -1,6 +1,9 @@
 using ABI_RC.Core.Networking;
 using ABI_RC.Core.Networking.API;
 using ABI_RC.Core.Networking.API.Responses;
+using ABI_RC.Core.Networking.API.Responses.CategoriesV2;
+using ABI_RC.Core.Networking.API.Responses.CategoriesV2.User;
+using ABI_RC.Core.Networking.API.Responses.DetailsV2;
 using MelonLoader;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
@@ -17,13 +20,15 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
       }
 
       MelonLogger.Msg($"[ABI API Call] Fetching avatar {guid} details...");
-      BaseResponse<AvatarDetailsResponse> response;
+      BaseResponse<ContentAvatarResponse> response;
       try
       {
         var payload = new { avatarID = guid };
-        response = await ApiConnection.MakeRequest<AvatarDetailsResponse>(
+        // Try with API version "2" explicitly as Kafeijao's OSC mod does
+        response = await ApiConnection.MakeRequest<ContentAvatarResponse>(
           ApiConnection.ApiOperation.AvatarDetail,
-          payload
+          payload,
+          "2"  // Explicitly use API v2
         );
       }
       catch (Exception ex)
@@ -39,17 +44,23 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
       }
       MelonLogger.Msg($"[ABI API Call] Fetched avatar {guid} details successfully!");
 
+      // Get platform-specific data (FileSize, UpdatedAt, Tags)
+      PlatformData platformData = null;
+      response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData);
+      
+      string authorName = response.Data.Author?.Name;
+
       return new AvatarAbiApiInfo
       {
         AvatarName = response.Data.Name,
         Description = response.Data.Description,
-        AuthorName = response.Data.User.Name, // Changed to use Name instead of Username
+        AuthorName = authorName,
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = response.Data.UpdatedAt,
-        SwitchPermitted = response.Data.SwitchPermitted,
-        IsPublished = response.Data.IsPublished,
-        Categories = response.Data.Categories,
-        FileSize = response.Data.FileSize
+        UpdatedAt = platformData?.UpdatedAt ?? response.Data.UploadedAt,
+        SwitchPermitted = response.Data.Permitted,
+        IsPublished = response.Data.Public,
+        Categories = response.Data.Categories?.ToArray(),
+        FileSize = (long)(platformData?.FileSize ?? 0)
       };
     }
   }

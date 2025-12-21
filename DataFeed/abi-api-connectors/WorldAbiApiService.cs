@@ -1,6 +1,7 @@
 using ABI_RC.Core.Networking;
 using ABI_RC.Core.Networking.API;
 using ABI_RC.Core.Networking.API.Responses;
+using ABI_RC.Core.Networking.API.Responses.DetailsV2;
 using MelonLoader;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
@@ -17,11 +18,16 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
       }
 
       MelonLogger.Msg($"[ABI API Call] Fetching world {guid} details...");
-      BaseResponse<DetailedWorld> response;
+      BaseResponse<ContentWorldResponse> response;
       try
       {
         var payload = new { worldID = guid };
-        response = await ApiConnection.MakeRequest<DetailedWorld>(ApiConnection.ApiOperation.WorldDetail, payload);
+        // Use API version "2" explicitly to get complete data (Author, Platforms, Tags, FileSize)
+        response = await ApiConnection.MakeRequest<ContentWorldResponse>(
+          ApiConnection.ApiOperation.WorldDetail,
+          payload,
+          "2"  // Explicitly use API v2
+        );
       }
       catch (Exception ex)
       {
@@ -36,17 +42,21 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
       }
       MelonLogger.Msg($"[ABI API Call] Fetched world {guid} details successfully!");
 
+      // Get platform-specific data (Tags, FileSize, UpdatedAt, CompatibilityVersion)
+      PlatformData platformData = null;
+      response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData);
+
       return new WorldAbiApiInfo
       {
         Description = response.Data.Description,
-        Tags = response.Data.Tags,
-        Categories = response.Data.Categories,
-        FileSize = response.Data.FileSize,
+        Tags = platformData?.Tags ?? new string[0],
+        Categories = response.Data.Categories?.ToArray(),
+        FileSize = (long)(platformData?.FileSize ?? 0),
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = response.Data.UpdatedAt,
-        AuthorName = response.Data.Author.Name,
-        CompatibilityVersion = response.Data.CompatibilityVersion,
-        Platform = response.Data.Platform
+        UpdatedAt = platformData?.UpdatedAt ?? response.Data.UploadedAt,
+        AuthorName = response.Data.Author?.Name,
+        CompatibilityVersion = platformData?.CompatibilityVersion ?? CompatibilityVersions.Invalid,
+        Platform = Platforms.Pc_Standalone
       };
     }
   }

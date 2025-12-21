@@ -1,3 +1,4 @@
+using ABI_RC.Core.Networking.IO.Instancing;
 using ABI_RC.Core.Savior;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.Interfaces;
 
@@ -55,10 +56,10 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       if (metaPort == null)
         return;
 
-      _currentInstanceId = metaPort.CurrentInstanceId;
-      _currentInstanceName = metaPort.CurrentInstanceName;
-      _currentWorldId = metaPort.CurrentWorldId;
-      _currentInstancePrivacy = metaPort.CurrentInstancePrivacy;
+      _currentInstanceId = Instances.CurrentInstanceId;
+      _currentInstanceName = Instances.CurrentInstanceName;
+      _currentWorldId = Instances.CurrentWorldId;
+      _currentInstancePrivacy = Instances.CurrentInstancePrivacyType.ToString();
     }
 
     public bool UpdateMetaPortWorldSettings()
