@@ -1,18 +1,13 @@
 {
   "_id": 254,
   "name": "THtoCVR",
-  "modversion": "0.1.0",
+  "modversion": "0.1.1",
   "gameversion": "2025r179",
   "loaderversion": "v0.7.0",
   "modtype": "Mod",
   "author": "NovaVoidHowl",
   "description": "This mod provides Temperature/Humidity values as avatar animator parameters, please see source link for more information.",
-  "searchtags": [
-    "animator",
-    "parameter",
-    "Temperature",
-    "Humidity"
-  ],
+  "searchtags": ["animator", "parameter", "Temperature", "Humidity"],
   "requirements": [],
   "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r6/THtoCVR.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/THtoCVR",

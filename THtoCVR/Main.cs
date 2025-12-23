@@ -234,63 +234,7 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
           throw new JsonReaderException("Config file does not match the expected structure.");
         }
 
-        bool configModified = false;
-
-        foreach (var connection in configJson.Connections)
-        {
-          if (string.IsNullOrEmpty(connection.BaseUrl))
-          {
-            MelonLogger.Error("BaseUrl is missing or empty.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-
-          // Auto-fix: Add trailing slash to BaseUrl if missing
-          if (!connection.BaseUrl.EndsWith("/"))
-          {
-            MelonLogger.Warning($"Adding trailing slash to BaseUrl: {connection.BaseUrl}");
-            connection.BaseUrl += "/";
-            configModified = true;
-          }
-
-          // Auto-fix: Remove leading slash from endpoints if present
-          if (!string.IsNullOrEmpty(connection.TemperatureEndpoint) && connection.TemperatureEndpoint.StartsWith("/"))
-          {
-            MelonLogger.Warning($"Removing leading slash from TemperatureEndpoint: {connection.TemperatureEndpoint}");
-            connection.TemperatureEndpoint = connection.TemperatureEndpoint.TrimStart('/');
-            configModified = true;
-          }
-          if (!string.IsNullOrEmpty(connection.HumidityEndpoint) && connection.HumidityEndpoint.StartsWith("/"))
-          {
-            MelonLogger.Warning($"Removing leading slash from HumidityEndpoint: {connection.HumidityEndpoint}");
-            connection.HumidityEndpoint = connection.HumidityEndpoint.TrimStart('/');
-            configModified = true;
-          }
-          if (connection.TemperatureEndpointEnable && string.IsNullOrEmpty(connection.TemperatureEndpoint))
-          {
-            MelonLogger.Error("TemperatureEndpoint is enabled but missing or empty.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-          if (connection.HumidityEndpointEnable && string.IsNullOrEmpty(connection.HumidityEndpoint))
-          {
-            MelonLogger.Error("HumidityEndpoint is enabled but missing or empty.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-          if (string.IsNullOrEmpty(connection.TemperatureEndpointAnimatorParameter))
-          {
-            MelonLogger.Error("TemperatureEndpointAnimatorParameter is missing or empty.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-          if (string.IsNullOrEmpty(connection.HumidityEndpointAnimatorParameter))
-          {
-            MelonLogger.Error("HumidityEndpointAnimatorParameter is missing or empty.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-          if (connection.PolingRate <= 0)
-          {
-            MelonLogger.Error("PolingRate is invalid or less than or equal to 0.");
-            throw new JsonReaderException(jsonErrorMissingField);
-          }
-        }
+        bool configModified = ValidateAndFixConnections(configJson.Connections);
 
         // Save the corrected config if modifications were made
         if (configModified)
@@ -333,6 +277,88 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
       }
     }
 
+    private static bool ValidateAndFixConnections(List<Connection> connections)
+    {
+      bool configModified = false;
+
+      foreach (var connection in connections)
+      {
+        ValidateConnection(connection);
+        configModified |= AutoFixConnectionEndpoints(connection);
+      }
+
+      return configModified;
+    }
+
+    private static void ValidateConnection(Connection connection)
+    {
+      if (string.IsNullOrEmpty(connection.BaseUrl))
+      {
+        MelonLogger.Error("BaseUrl is missing or empty.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+
+      if (connection.TemperatureEndpointEnable && string.IsNullOrEmpty(connection.TemperatureEndpoint))
+      {
+        MelonLogger.Error("TemperatureEndpoint is enabled but missing or empty.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+
+      if (connection.HumidityEndpointEnable && string.IsNullOrEmpty(connection.HumidityEndpoint))
+      {
+        MelonLogger.Error("HumidityEndpoint is enabled but missing or empty.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+
+      if (string.IsNullOrEmpty(connection.TemperatureEndpointAnimatorParameter))
+      {
+        MelonLogger.Error("TemperatureEndpointAnimatorParameter is missing or empty.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+
+      if (string.IsNullOrEmpty(connection.HumidityEndpointAnimatorParameter))
+      {
+        MelonLogger.Error("HumidityEndpointAnimatorParameter is missing or empty.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+
+      if (connection.PolingRate <= 0)
+      {
+        MelonLogger.Error("PolingRate is invalid or less than or equal to 0.");
+        throw new JsonReaderException(jsonErrorMissingField);
+      }
+    }
+
+    private static bool AutoFixConnectionEndpoints(Connection connection)
+    {
+      bool modified = false;
+
+      // Auto-fix: Add trailing slash to BaseUrl if missing
+      if (!connection.BaseUrl.EndsWith('/'))
+      {
+        MelonLogger.Warning($"Adding trailing slash to BaseUrl: {connection.BaseUrl}");
+        connection.BaseUrl += "/";
+        modified = true;
+      }
+
+      // Auto-fix: Remove leading slash from endpoints if present
+      if (!string.IsNullOrEmpty(connection.TemperatureEndpoint) && connection.TemperatureEndpoint.StartsWith('/'))
+      {
+        MelonLogger.Warning($"Removing leading slash from TemperatureEndpoint: {connection.TemperatureEndpoint}");
+        connection.TemperatureEndpoint = connection.TemperatureEndpoint.TrimStart('/');
+        modified = true;
+      }
+
+      if (!string.IsNullOrEmpty(connection.HumidityEndpoint) && connection.HumidityEndpoint.StartsWith('/'))
+      {
+        MelonLogger.Warning($"Removing leading slash from HumidityEndpoint: {connection.HumidityEndpoint}");
+        connection.HumidityEndpoint = connection.HumidityEndpoint.TrimStart('/');
+        modified = true;
+      }
+
+      return modified;
+    }
+
     private static async Task HandleConnectionAsync(
       Connection connection,
       CancellationToken cancellationToken,
@@ -369,7 +395,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
     {
       try
       {
-        VerboseMelonLogger.Msg($"Fetching temperature from: {connection.BaseUrl}{connection.TemperatureEndpoint}", verboseLogging);
+        VerboseMelonLogger.Msg(
+          $"Fetching temperature from: {connection.BaseUrl}{connection.TemperatureEndpoint}",
+          verboseLogging
+        );
         var response = await client.GetStringAsync(connection.BaseUrl + connection.TemperatureEndpoint);
         VerboseMelonLogger.Msg($"Temperature response: {response}", verboseLogging);
         var temperatureData = JsonConvert.DeserializeObject<SensorData>(response);
@@ -382,7 +411,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
           // Update the animator parameter
           if (PlayerSetup.Instance?.AnimatorManager != null)
           {
-            VerboseMelonLogger.Msg($"Setting parameter {connection.TemperatureEndpointAnimatorParameter} to {temperatureData.Value}", verboseLogging);
+            VerboseMelonLogger.Msg(
+              $"Setting parameter {connection.TemperatureEndpointAnimatorParameter} to {temperatureData.Value}",
+              verboseLogging
+            );
             PlayerSetup.Instance.AnimatorManager.SetParameter(
               connection.TemperatureEndpointAnimatorParameter,
               float.Parse(temperatureData.Value)
@@ -395,7 +427,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
         }
         else
         {
-          VerboseMelonLogger.Error($"Temperature data is null or Value is empty. Data: {temperatureData?.Value ?? "null"}", verboseLogging);
+          VerboseMelonLogger.Error(
+            $"Temperature data is null or Value is empty. Data: {temperatureData?.Value ?? "null"}",
+            verboseLogging
+          );
         }
       }
       catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
@@ -417,7 +452,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
     {
       try
       {
-        VerboseMelonLogger.Msg($"Fetching humidity from: {connection.BaseUrl}{connection.HumidityEndpoint}", verboseLogging);
+        VerboseMelonLogger.Msg(
+          $"Fetching humidity from: {connection.BaseUrl}{connection.HumidityEndpoint}",
+          verboseLogging
+        );
         var response = await client.GetStringAsync(connection.BaseUrl + connection.HumidityEndpoint);
         VerboseMelonLogger.Msg($"Humidity response: {response}", verboseLogging);
         var humidityData = JsonConvert.DeserializeObject<SensorData>(response);
@@ -430,7 +468,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
           // Update the animator parameter
           if (PlayerSetup.Instance?.AnimatorManager != null)
           {
-            VerboseMelonLogger.Msg($"Setting parameter {connection.HumidityEndpointAnimatorParameter} to {humidityData.Value}", verboseLogging);
+            VerboseMelonLogger.Msg(
+              $"Setting parameter {connection.HumidityEndpointAnimatorParameter} to {humidityData.Value}",
+              verboseLogging
+            );
             PlayerSetup.Instance.AnimatorManager.SetParameter(
               connection.HumidityEndpointAnimatorParameter,
               float.Parse(humidityData.Value)
@@ -443,7 +484,10 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
         }
         else
         {
-          VerboseMelonLogger.Error($"Humidity data is null or Value is empty. Data: {humidityData?.Value ?? "null"}", verboseLogging);
+          VerboseMelonLogger.Error(
+            $"Humidity data is null or Value is empty. Data: {humidityData?.Value ?? "null"}",
+            verboseLogging
+          );
         }
       }
       catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)

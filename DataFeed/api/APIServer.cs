@@ -12,7 +12,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
   // Custom module to add CORS headers to all responses
   public class CorsModule : WebModuleBase
   {
-    public CorsModule(string baseRoute) : base(baseRoute) { }
+    public CorsModule(string baseRoute)
+      : base(baseRoute) { }
 
     public override bool IsFinalHandler => false;
 
@@ -80,11 +81,12 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       #endregion // WebSocket API v1
 
       // Setup REST API server with multiple URL prefixes to support localhost, 127.0.0.1, and ::1
-      httpServer = new WebServer(o => o
-        .WithUrlPrefix($"http://localhost:{config.RestApiPortInt}/")
-        .WithUrlPrefix($"http://127.0.0.1:{config.RestApiPortInt}/")
-        .WithUrlPrefix($"http://[::1]:{config.RestApiPortInt}/")
-        .WithMode(HttpListenerMode.Microsoft)
+      httpServer = new WebServer(
+        o =>
+          o.WithUrlPrefix($"http://localhost:{config.RestApiPortInt}/")
+            .WithUrlPrefix($"http://127.0.0.1:{config.RestApiPortInt}/")
+            .WithUrlPrefix($"http://[::1]:{config.RestApiPortInt}/")
+            .WithMode(HttpListenerMode.Microsoft)
       )
         // Add CORS module FIRST to intercept all requests and add headers
         .WithModule(new CorsModule("/"))

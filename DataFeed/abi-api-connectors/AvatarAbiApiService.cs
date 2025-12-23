@@ -28,7 +28,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
         response = await ApiConnection.MakeRequest<ContentAvatarResponse>(
           ApiConnection.ApiOperation.AvatarDetail,
           payload,
-          "2"  // Explicitly use API v2
+          "2" // Explicitly use API v2
         );
       }
       catch (Exception ex)
