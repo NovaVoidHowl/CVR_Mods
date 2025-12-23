@@ -15,8 +15,8 @@
     "Websocket"
   ],
   "requirements": [],
-  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r6/DataFeed.dll",
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r7/DataFeed.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
-  "changelog": " - Recompiled for CVR 2025r180\n - Enhanced realtime endpoints\n - Added world endpoint",
+  "changelog": " - Updated for CVR 2025r181 API changes\n - Fixed browser overlay CORS/connection issues\n - Added multi-host binding (localhost, 127.0.0.1, IPv6)\n - Fixed missing avatar/world metadata (authors, tags, file sizes)",
   "embedcolor": "FFBC00"
 }
