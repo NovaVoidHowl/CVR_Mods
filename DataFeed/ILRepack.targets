@@ -24,7 +24,7 @@
       <!-- For debugging - log the package versions we found -->
       <PackagesToLog Include="@(PackageVersions -> '%(Identity): %(Version)')" />
     </ItemGroup>
-    
+
     <!-- Get individual package versions -->
     <PropertyGroup>
       <!-- Extract versions for each package we need -->
@@ -68,27 +68,27 @@
       <!-- Add debugging output for paths -->
       <OutputAssemblyPath>$(OutputPath)$(AssemblyName).dll</OutputAssemblyPath>
     </PropertyGroup>
-    
+
     <Message Text="DEBUG: OutputPath = $(OutputPath)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: AssemblyName = $(AssemblyName)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: OutputAssemblyPath = $(OutputAssemblyPath)" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
-    
+
     <!-- Get file size before merging in bytes -->
     <Exec Command="powershell -Command &quot;(Get-Item '$(OutputPath)$(AssemblyName).dll').Length&quot;" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="PreMergeSizeBytes" />
     </Exec>
-    
+
     <!-- Calculate file size in KB -->
     <PropertyGroup>
       <PreMergeSize>$([MSBuild]::Divide($(PreMergeSizeBytes), 1024).ToString('0.00'))</PreMergeSize>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <!-- Search paths for assembly resolution -->
       <IlRepackLibs Include="$(SolutionDir).ManagedLibs\" />
       <IlRepackLibs Include="$(ExtraLibsFolder)" />
       <IlRepackLibs Include="$(OutputPath)" />
-      
+
       <!-- Our output dll without any dependency embedded -->
       <InputAssemblies Include="$(OutputPath)$(AssemblyName).dll" />
       <!-- Our dll dependencies to be merged, with explicit paths -->
@@ -103,7 +103,7 @@
       <FilesToCleanup Include="$(OutputPath)Swan.Lite.dll" />
       <FilesToCleanup Include="$(OutputPath)System.ValueTuple.dll" />
     </ItemGroup>
-    
+
     <!-- Always show basic validation -->
     <Message Text="=================================" Importance="High"/>
     <Message Text="| Build Validation" Importance="High" />
@@ -120,30 +120,30 @@
     <Message Text="DEBUG: @(InputAssemblies->'%(FullPath)')" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: Library search paths:" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
     <Message Text="DEBUG: @(IlRepackLibs->'%(FullPath)')" Importance="High" Condition="'$(EnableDebugOutput)' == 'true'" />
-    
+
     <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputPath)$(AssemblyName).dll" Importance="High" />
-    
+
     <!-- Use the full explicit paths and specify search directories -->
-    <ILRepack 
-      Internalize="false" 
-      LibraryPath="@(IlRepackLibs)" 
-      OutputFile="$(OutputPath)$(AssemblyName).dll" 
-      InputAssemblies="@(InputAssemblies)" 
-      Parallel="true" 
+    <ILRepack
+      Internalize="false"
+      LibraryPath="@(IlRepackLibs)"
+      OutputFile="$(OutputPath)$(AssemblyName).dll"
+      InputAssemblies="@(InputAssemblies)"
+      Parallel="true"
       Verbose="$(EnableDebugOutput)" />
 
     <!-- Get file size after merging in bytes -->
     <Exec Command="powershell -Command &quot;(Get-Item '$(OutputPath)$(AssemblyName).dll').Length&quot;" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="PostMergeSizeBytes" />
     </Exec>
-    
+
     <!-- Calculate sizes in KB -->
     <PropertyGroup>
       <PostMergeSize>$([MSBuild]::Divide($(PostMergeSizeBytes), 1024).ToString('0.00'))</PostMergeSize>
       <SizeDifferenceBytes>$([MSBuild]::Subtract($(PostMergeSizeBytes), $(PreMergeSizeBytes)))</SizeDifferenceBytes>
       <SizeDifferenceKB>$([MSBuild]::Divide($(SizeDifferenceBytes), 1024).ToString('0.00'))</SizeDifferenceKB>
     </PropertyGroup>
-    
+
     <Message Text="=================================" Importance="High"/>
     <Message Text="| Merge Summary" Importance="High" />
     <Message Text="|- ILRepack completed successfully." Importance="High" />
@@ -152,7 +152,7 @@
     <Message Text="|- Post-Merge Size: $(PostMergeSize) KB" Importance="High" />
     <Message Text="|- Size Difference: $(SizeDifferenceKB) KB" Importance="High" />
     <Message Text="=================================" Importance="High" />
-    
+
     <!-- Now clean up the extra DLLs -->
     <Message Text="Cleaning up extra DLLs from output directory..." Importance="High" />
     <Delete Files="@(FilesToCleanup)" TreatErrorsAsWarnings="true">

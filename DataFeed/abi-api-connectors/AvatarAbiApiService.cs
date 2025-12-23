@@ -47,7 +47,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
       // Get platform-specific data (FileSize, UpdatedAt, Tags)
       PlatformData platformData = null;
       response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData);
-      
+
       string authorName = response.Data.Author?.Name;
 
       return new AvatarAbiApiInfo

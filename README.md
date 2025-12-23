@@ -82,7 +82,7 @@ feel free to leave bug reports or feature requests!
 
 > [!TIP]
 > Should you wish to review the source code of these mods and compile them yourself please note that this project
-> is setup for use with Visual Studio 2022 
+> is setup for use with Visual Studio 2022
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- MOD LIST -->
