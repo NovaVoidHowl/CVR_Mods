@@ -60,6 +60,34 @@ humidityEndpoint
 }
 ```
 
+## Configuration Auto-Fix
+
+The mod automatically validates and corrects common configuration errors when it initialises:
+
+### Auto-Corrections Applied
+
+- **BaseUrl trailing slash**: Automatically adds `/` if missing
+  - Example: `http://192.168.2.143` → `http://192.168.2.143/`
+- **Endpoint leading slashes**: Automatically removes leading `/` from temperature and humidity endpoints
+  - Example: `/temperature` → `temperature`
+
+### When Auto-Fix Runs
+
+Configuration validation and auto-correction occurs when:
+
+- The game starts with the mod enabled
+- The mod is enabled/disabled via MelonPreferences
+- Configuration file location is changed
+- Verbose logging settings are changed
+- Connecting to an instance
+- Loading an avatar
+
+### Auto-Fix Behavior
+
+- Warnings are logged to the MelonLoader console when corrections are made
+- The corrected configuration is automatically saved back to the config file
+- Prevents URL construction issues (e.g., double slashes `//` or missing slashes)
+
 ### Notes
 
 - if the `THtoCVRDisabled` is true you should disregard the values passed by the other parameters

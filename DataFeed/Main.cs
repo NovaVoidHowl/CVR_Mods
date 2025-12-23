@@ -310,7 +310,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     {
       // Update MetaPort data immediately to get current world information
       _metaPortReader.UpdateInstanceInfo();
-      
+
       string worldId = _metaPortReader.CurrentWorldId;
       WorldAbiApiInfo worldDetails = null;
 

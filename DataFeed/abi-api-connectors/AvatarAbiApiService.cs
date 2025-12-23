@@ -1,7 +1,7 @@
-using ABI_RC.Core.Networking;
 using ABI_RC.Core.Networking.API;
 using ABI_RC.Core.Networking.API.Responses;
-using MelonLoader;
+using ABI_RC.Core.Networking.API.Responses.DetailsV2;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
 {
@@ -9,47 +9,35 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
   {
     public static async Task<AvatarAbiApiInfo> RequestAvatarDetails(string guid)
     {
-      // Check if user is authenticated before making the request
-      if (!AuthManager.IsAuthenticated)
+      var payload = new { avatarID = guid };
+      var response = await AbiApiHelper.MakeApiRequest<ContentAvatarResponse>(
+        ApiConnection.ApiOperation.AvatarDetail,
+        payload,
+        "avatar",
+        guid
+      );
+
+      if (response == null)
       {
-        MelonLogger.Warning("[ABI API Call] Cannot fetch avatar details - user is not authenticated");
         return null;
       }
 
-      MelonLogger.Msg($"[ABI API Call] Fetching avatar {guid} details...");
-      BaseResponse<AvatarDetailsResponse> response;
-      try
-      {
-        var payload = new { avatarID = guid };
-        response = await ApiConnection.MakeRequest<AvatarDetailsResponse>(
-          ApiConnection.ApiOperation.AvatarDetail,
-          payload
-        );
-      }
-      catch (Exception ex)
-      {
-        MelonLogger.Error($"[ABI API Call] Fetching avatar {guid} details has Failed!");
-        MelonLogger.Error(ex);
-        return null;
-      }
-      if (response == null)
-      {
-        MelonLogger.Msg($"[ABI API Call] Fetching avatar {guid} details has Failed! Response came back empty.");
-        return null;
-      }
-      MelonLogger.Msg($"[ABI API Call] Fetched avatar {guid} details successfully!");
+      // Get platform-specific data (FileSize, UpdatedAt, Tags)
+      var hasPlatformData = AbiApiHelper.TryGetPlatformData(response.Data.Platforms, out var platformData);
+
+      string authorName = response.Data.Author?.Name;
 
       return new AvatarAbiApiInfo
       {
         AvatarName = response.Data.Name,
         Description = response.Data.Description,
-        AuthorName = response.Data.User.Name, // Changed to use Name instead of Username
+        AuthorName = authorName,
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = response.Data.UpdatedAt,
-        SwitchPermitted = response.Data.SwitchPermitted,
-        IsPublished = response.Data.IsPublished,
-        Categories = response.Data.Categories,
-        FileSize = response.Data.FileSize
+        UpdatedAt = hasPlatformData ? platformData.UpdatedAt : response.Data.UploadedAt,
+        SwitchPermitted = response.Data.Permitted,
+        IsPublished = response.Data.Public,
+        Categories = response.Data.Categories?.ToArray(),
+        FileSize = hasPlatformData ? (long)platformData.FileSize : 0
       };
     }
   }

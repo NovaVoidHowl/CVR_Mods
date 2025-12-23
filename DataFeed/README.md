@@ -11,7 +11,6 @@ controller and for other apps over REST and Websocket APIs.
 > you will need to use a proxy (such as haproxy) to expose the APIs
 >
 > It is recommend to use ssl (https/wss) if you do this.
->
 
 ## Avatar Parameters
 
@@ -37,7 +36,7 @@ NOTE: if the `dataFeedDisabled` is true you should disregard the values passed b
 
 |             Option              | Description                                                              |
 | :-----------------------------: | :----------------------------------------------------------------------- |
-|             Enable              | Turns the mod on/off                                               |
+|             Enable              | Turns the mod on/off                                                     |
 | Avatar Parameter Output Enabled | Enables/Disables sending the booleans to the avatar controller variables |
 |           API Enable            | Turns on/off the websocket and REST API endpoints                        |
 |          REST API Port          | The REST API endpoint port on your system                                |
@@ -51,13 +50,11 @@ In addition to the above MellonLoader variables there is `API Key` this is used 
 >
 > The API key will not show up in the Mod Settings Menu, this is intentional to reduce the likelihood of accidentally
 > leaking keys (in screenshots etc.)
->
 
 > [!TIP]
 >
 > Your API key for the endpoints will show up in the MellonLoader preferences file after you have run the game for the
 > first time with the mod installed
->
 
 For REST API you connect to [http://127.0.0.1:8080/](http://127.0.0.1:8080/), a full list of endpoints will be shown\
 For Websocket API you connect to [ws://127.0.0.1:8081/](ws://127.0.0.1:8081/), note only valid endpoints will return values
@@ -65,7 +62,6 @@ For Websocket API you connect to [ws://127.0.0.1:8081/](ws://127.0.0.1:8081/), n
 > [!TIP]
 >
 > The above ports are the defaults you can change them in the mod's settings
->
 
 To authenticate to either you use the header `X-API-Key` with the value of that header being the `API Key` value from
 the MellonLoader preferences file in the `DataFeed` section
@@ -73,7 +69,6 @@ the MellonLoader preferences file in the `DataFeed` section
 > [!TIP]
 >
 > You can find the MellonLoader preferences file under your ChilloutVR install folder in `/UserData/MelonPreferences.cfg`
->
 
 ### Example API output
 
@@ -83,22 +78,22 @@ The following are example outputs from the mod's API endpoints
 
 ```json
 {
-    "currentInstanceId": "i+74a8fa0301855f7a-001003-5d0e8d-173e8a16",
-    "currentInstanceName": "ChilloutVR Hub (#111098)",
-    "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
-    "currentInstancePrivacy": "OwnerMustInvite",
-    "worldDetails": {
-        "Tags": [],
-        "CompatibilityVersion": 2,
-        "Platform": 0,
-        "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
-        "AuthorName": "ChilloutVR",
-        "UploadedAt": "2020-04-06T20:50:25",
-        "UpdatedAt": "2024-03-27T02:23:12",
-        "Categories": [],
-        "FileSize": 44292857
-    },
-    "detailsAvailable": true
+  "currentInstanceId": "i+74a8fa0301855f7a-001003-5d0e8d-173e8a16",
+  "currentInstanceName": "ChilloutVR Hub (#111098)",
+  "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
+  "currentInstancePrivacy": "OwnerMustInvite",
+  "worldDetails": {
+    "Tags": [],
+    "CompatibilityVersion": 2,
+    "Platform": 0,
+    "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
+    "AuthorName": "ChilloutVR",
+    "UploadedAt": "2020-04-06T20:50:25",
+    "UpdatedAt": "2024-03-27T02:23:12",
+    "Categories": [],
+    "FileSize": 44292857
+  },
+  "detailsAvailable": true
 }
 ```
 
@@ -106,19 +101,19 @@ The following are example outputs from the mod's API endpoints
 
 ```json
 {
-    "currentAvatarId": "17c267db-18c4-4900-bb73-ad323f082640",
-    "avatarDetails": {
-        "AvatarName": "Space Robot Kyle",
-        "SwitchPermitted": true,
-        "IsPublished": true,
-        "Description": "by Unity Technologies",
-        "AuthorName": "ChilloutVR",
-        "UploadedAt": "2020-01-24T17:24:58",
-        "UpdatedAt": "2023-05-16T11:33:02",
-        "Categories": [],
-        "FileSize": 1267287
-    },
-    "detailsAvailable": true
+  "currentAvatarId": "17c267db-18c4-4900-bb73-ad323f082640",
+  "avatarDetails": {
+    "AvatarName": "Space Robot Kyle",
+    "SwitchPermitted": true,
+    "IsPublished": true,
+    "Description": "by Unity Technologies",
+    "AuthorName": "ChilloutVR",
+    "UploadedAt": "2020-01-24T17:24:58",
+    "UpdatedAt": "2023-05-16T11:33:02",
+    "Categories": [],
+    "FileSize": 1267287
+  },
+  "detailsAvailable": true
 }
 ```
 
@@ -126,20 +121,20 @@ The following are example outputs from the mod's API endpoints
 
 ```json
 {
-    "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
-    "worldDetails": {
-        "Tags": [],
-        "CompatibilityVersion": 2,
-        "Platform": 0,
-        "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
-        "AuthorName": "ChilloutVR",
-        "Name": "ChilloutVR Hub",
-        "UploadedAt": "2020-04-06T20:50:25",
-        "UpdatedAt": "2024-03-27T02:23:12",
-        "Categories": [],
-        "FileSize": 44292857
-    },
-    "detailsAvailable": true
+  "currentWorldId": "501e2584-ce9a-4570-8c28-ef496e033f5f",
+  "worldDetails": {
+    "Tags": [],
+    "CompatibilityVersion": 2,
+    "Platform": 0,
+    "Description": "A new dawn begins atop this chill mountain. - World by Maebbie",
+    "AuthorName": "ChilloutVR",
+    "Name": "ChilloutVR Hub",
+    "UploadedAt": "2020-04-06T20:50:25",
+    "UpdatedAt": "2024-03-27T02:23:12",
+    "Categories": [],
+    "FileSize": 44292857
+  },
+  "detailsAvailable": true
 }
 ```
 
@@ -148,19 +143,18 @@ The following are example outputs from the mod's API endpoints
 > The World endpoint provides detailed information about the current world when available through the ChilloutVR API.
 > If `detailsAvailable` is `false`, the `worldDetails` object will contain mostly null values, and you should fall back
 > to using the instance information from the Instance endpoint.
->
 
 #### Parameters (`/api/v1/parameters`)
 
 ```json
 {
-    "flyingAllowed": true,
-    "propsAllowed": true,
-    "portalsAllowed": true,
-    "nameplatesEnabled": true,
-    "dataFeedErrorBBCC": false,
-    "dataFeedErrorMetaPort": false,
-    "dataFeedDisabled": false
+  "flyingAllowed": true,
+  "propsAllowed": true,
+  "portalsAllowed": true,
+  "nameplatesEnabled": true,
+  "dataFeedErrorBBCC": false,
+  "dataFeedErrorMetaPort": false,
+  "dataFeedDisabled": false
 }
 ```
 
@@ -168,12 +162,12 @@ The following are example outputs from the mod's API endpoints
 
 ```json
 {
-    "currentPing": 22,
-    "isConnected": true,
-    "connectionState": "Connected",
-    "dataFeedErrorNetworkManager": false,
-    "currentFPS": 60,
-    "voiceCommsPing": 15
+  "currentPing": 22,
+  "isConnected": true,
+  "connectionState": "Connected",
+  "dataFeedErrorNetworkManager": false,
+  "currentFPS": 60,
+  "voiceCommsPing": 15
 }
 ```
 
@@ -191,7 +185,6 @@ The WebSocket API provides several endpoints for different types of data:
 >
 > For real-time monitoring applications, use `/api/v1/realtime` which updates every second.
 > For static information that changes less frequently, use the specific endpoints like `/api/v1/world` or `/api/v1/avatar`.
->
 
 ### WebSocket Real-time Data
 
@@ -200,19 +193,19 @@ REST realtime endpoint:
 
 ```json
 {
-    "currentPing": 22,
-    "isConnected": true,
-    "connectionState": "Connected",
-    "dataFeedErrorNetworkManager": false,
-    "currentFPS": 60,
-    "voiceCommsPing": 15
+  "currentPing": 22,
+  "isConnected": true,
+  "connectionState": "Connected",
+  "dataFeedErrorNetworkManager": false,
+  "currentFPS": 60,
+  "voiceCommsPing": 15
 }
 ```
 
 Where:
 
 - `currentPing`: Network latency to the game server in milliseconds
-- `isConnected`: Boolean indicating if connected to the game server  
+- `isConnected`: Boolean indicating if connected to the game server
 - `connectionState`: String representation of the connection state (e.g., "Connected", "Disconnected", "Connecting")
 - `dataFeedErrorNetworkManager`: Boolean indicating if there was an error reading NetworkManager data
 - `currentFPS`: Current frames per second of the game
@@ -230,10 +223,55 @@ that demonstrates how to use both the REST API and WebSocket endpoints together:
 - **Real-time Network Display**: Shows game ping, FPS, and connection status using the WebSocket `/api/v1/realtime`
   endpoint
 - **World Information Panel**: Displays current world name, author etc. via the REST `/api/v1/instance`
-  endpoint  
+  endpoint
 - **Avatar Information Panel**: Shows current avatar details and tags using the REST `/api/v1/avatar` endpoint
 - **Auto-reconnection**: Handles connection drops gracefully and reconnects automatically
 - **OBS Integration**: Ready-to-use browser source overlay for streamers
+
+### Important: CORS and Local File Restrictions
+
+> [!NOTE]
+>
+> **As of DataFeed v0.9.2 (2025r181 update):** Opening the overlay directly as a file (`file:///C:/path/to/index.html`)
+> now works thanks to improved CORS handling and multi-host binding (localhost, 127.0.0.1, ::1).
+>
+> **However, we still recommend serving via HTTP** due to evolving browser security policies. Chrome and other browsers
+> frequently tighten CORS restrictions for `file://` origins, and what works today may be blocked in future browser updates.
+
+**Recommended Setup Methods (for maximum compatibility):**
+
+1. **Python Simple HTTP Server** (Easiest):
+
+   ```powershell
+   cd path/to/CVR-DataFeed-OBS-Overlay
+   python -m http.server 8000
+   ```
+
+   Then in OBS, use browser source URL: `http://localhost:8000/index.html`
+
+2. **Node.js http-server**:
+
+   ```powershell
+   npx http-server -p 8000
+   ```
+
+   Then use URL: `http://localhost:8000/index.html`
+
+3. **VS Code Live Server Extension**:
+
+   - Install "Live Server" extension in VS Code
+   - Right-click `index.html` → "Open with Live Server"
+   - Use the provided localhost URL in OBS
+
+4. **PowerShell Server Script** (included in overlay repo):
+   - Run `.\serve_overlay.ps1` in the overlay directory
+   - Use URL: `http://localhost:8000/index.html`
+   - Note this script needs python installed
+
+> [!TIP]
+>
+> Using HTTP serving ensures consistent behavior across all browsers and protects against future browser security updates
+> that may break `file://` access.
 
 ### Key Features
 

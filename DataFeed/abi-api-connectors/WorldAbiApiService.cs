@@ -1,7 +1,7 @@
-using ABI_RC.Core.Networking;
 using ABI_RC.Core.Networking.API;
 using ABI_RC.Core.Networking.API.Responses;
-using MelonLoader;
+using ABI_RC.Core.Networking.API.Responses.DetailsV2;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
 {
@@ -9,44 +9,33 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
   {
     public static async Task<WorldAbiApiInfo> RequestWorldDetails(string guid)
     {
-      // Check if user is authenticated before making the request
-      if (!AuthManager.IsAuthenticated)
+      var payload = new { worldID = guid };
+      var response = await AbiApiHelper.MakeApiRequest<ContentWorldResponse>(
+        ApiConnection.ApiOperation.WorldDetail,
+        payload,
+        "world",
+        guid
+      );
+
+      if (response == null)
       {
-        MelonLogger.Warning("[ABI API Call] Cannot fetch world details - user is not authenticated");
         return null;
       }
 
-      MelonLogger.Msg($"[ABI API Call] Fetching world {guid} details...");
-      BaseResponse<DetailedWorld> response;
-      try
-      {
-        var payload = new { worldID = guid };
-        response = await ApiConnection.MakeRequest<DetailedWorld>(ApiConnection.ApiOperation.WorldDetail, payload);
-      }
-      catch (Exception ex)
-      {
-        MelonLogger.Error($"[ABI API Call] Fetching world {guid} details has Failed!");
-        MelonLogger.Error(ex);
-        return null;
-      }
-      if (response == null)
-      {
-        MelonLogger.Msg($"[ABI API Call] Fetching world {guid} details has Failed! Response came back empty.");
-        return null;
-      }
-      MelonLogger.Msg($"[ABI API Call] Fetched world {guid} details successfully!");
+      // Get platform-specific data (Tags, FileSize, UpdatedAt, CompatibilityVersion)
+      var hasPlatformData = AbiApiHelper.TryGetPlatformData(response.Data.Platforms, out var platformData);
 
       return new WorldAbiApiInfo
       {
         Description = response.Data.Description,
-        Tags = response.Data.Tags,
-        Categories = response.Data.Categories,
-        FileSize = response.Data.FileSize,
+        Tags = hasPlatformData ? platformData.Tags : new string[0],
+        Categories = response.Data.Categories?.ToArray(),
+        FileSize = hasPlatformData ? (long)platformData.FileSize : 0,
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = response.Data.UpdatedAt,
-        AuthorName = response.Data.Author.Name,
-        CompatibilityVersion = response.Data.CompatibilityVersion,
-        Platform = response.Data.Platform
+        UpdatedAt = hasPlatformData ? platformData.UpdatedAt : response.Data.UploadedAt,
+        AuthorName = response.Data.Author?.Name,
+        CompatibilityVersion = hasPlatformData ? platformData.CompatibilityVersion : CompatibilityVersions.Invalid,
+        Platform = Platforms.Pc_Standalone
       };
     }
   }

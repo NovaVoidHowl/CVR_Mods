@@ -20,7 +20,7 @@ $dllsToStrip = @('Assembly-CSharp.dll','Assembly-CSharp-firstpass.dll','AVProVid
 $modNames = @("BTKUILib", "VRBinding")
 
 # Array with dlls to ignore from ManagedLibs
-$cvrManagedLibNamesToIgnore = @("netstandard", "Mono.Cecil", "Unity.Burst.Cecil")
+$cvrManagedLibNamesToIgnore = @("netstandard", "Mono.Cecil", "Unity.Burst.Cecil", "Microsoft.Win32.Registry")
 
 if ($cvrPath -and (Test-Path "$cvrPath\$cvrExecutable")) {
     # Found ChilloutVR.exe in the existing CVRPATH
@@ -159,7 +159,7 @@ if(Test-Path -Path ".\NStrip.exe") {
 else {
     # Try to locate NStrip.exe in the PATH
     $nStripPath = Get-Command -Name NStrip.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
-    if($nStripPath -eq $null) {
+    if($null -eq $nStripPath) {
         # Display an error message if NStrip.exe could not be found
         Write-Host "Could not find NStrip.exe in the current directory nor in the PATH." -ForegroundColor Red
         Write-Host "Visit https://github.com/bbepis/NStrip/releases/latest to grab a copy." -ForegroundColor Red

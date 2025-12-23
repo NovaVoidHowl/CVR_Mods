@@ -5,9 +5,38 @@ using EmbedIO.WebApi;
 using EmbedIO.Actions;
 using Newtonsoft.Json;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
+using System.Threading.Tasks;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 {
+  // Custom module to add CORS headers to all responses
+  public class CorsModule : WebModuleBase
+  {
+    public CorsModule(string baseRoute)
+      : base(baseRoute) { }
+
+    public override bool IsFinalHandler => false;
+
+    protected override async Task OnRequestAsync(IHttpContext context)
+    {
+      // Add CORS headers to every request
+      context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+      context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+      context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, X-API-Key, Authorization";
+      context.Response.Headers["Access-Control-Max-Age"] = "86400";
+
+      // Handle OPTIONS preflight - mark as handled and send empty response
+      if (context.Request.HttpMethod == "OPTIONS")
+      {
+        context.Response.StatusCode = 204;
+        context.SetHandled();
+        await context.SendDataAsync(new byte[0]);
+      }
+
+      // For other methods, headers are added but let next module handle the request
+    }
+  }
+
   public class ApiServer
   {
     private WebSocketServer wssv;
@@ -25,7 +54,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     private void InitializeServers()
     {
       // Setup WebSocket server
-      wssv = new WebSocketServer($"ws://127.0.0.1:{config.WebSocketPortInt}");
+      wssv = new WebSocketServer($"ws://localhost:{config.WebSocketPortInt}");
       #region WebSocket API v1
       // Create factory methods for all websocket services instead of reusing instances
       wssv.AddWebSocketService("/api/v1/parameters", () => new DataFeedWebSocketParametersV1(dataFeed));
@@ -51,10 +80,16 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 
       #endregion // WebSocket API v1
 
-      // Setup REST API server with explicit route configuration
+      // Setup REST API server with multiple URL prefixes to support localhost, 127.0.0.1, and ::1
       httpServer = new WebServer(
-        o => o.WithUrlPrefix($"http://127.0.0.1:{config.RestApiPortInt}").WithMode(HttpListenerMode.Microsoft)
+        o =>
+          o.WithUrlPrefix($"http://localhost:{config.RestApiPortInt}/")
+            .WithUrlPrefix($"http://127.0.0.1:{config.RestApiPortInt}/")
+            .WithUrlPrefix($"http://[::1]:{config.RestApiPortInt}/")
+            .WithMode(HttpListenerMode.Microsoft)
       )
+        // Add CORS module FIRST to intercept all requests and add headers
+        .WithModule(new CorsModule("/"))
         .WithWebApi("/api/v1", m => m.WithController<DataFeedControllerV1>(() => new DataFeedControllerV1(dataFeed)))
         .WithModule(
           new ActionModule(

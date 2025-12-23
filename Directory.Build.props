@@ -11,6 +11,10 @@
         <GenerateDependencyFile>false</GenerateDependencyFile>
         <!-- Required for NStrip to work -->
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!-- Target x64 to match MelonLoader architecture -->
+        <PlatformTarget>x64</PlatformTarget>
+        <!-- Auto-generate binding redirects to resolve version conflicts -->
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
