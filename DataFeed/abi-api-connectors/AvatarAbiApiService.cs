@@ -46,7 +46,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
 
       // Get platform-specific data (FileSize, UpdatedAt, Tags)
       PlatformData platformData = null;
-      response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData);
+      var hasPlatformData = response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData) ?? false;
 
       string authorName = response.Data.Author?.Name;
 
@@ -56,11 +56,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
         Description = response.Data.Description,
         AuthorName = authorName,
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = platformData?.UpdatedAt ?? response.Data.UploadedAt,
+        UpdatedAt = hasPlatformData ? platformData.UpdatedAt : response.Data.UploadedAt,
         SwitchPermitted = response.Data.Permitted,
         IsPublished = response.Data.Public,
         Categories = response.Data.Categories?.ToArray(),
-        FileSize = (long)(platformData?.FileSize ?? 0)
+        FileSize = hasPlatformData ? (long)platformData.FileSize : 0
       };
     }
   }

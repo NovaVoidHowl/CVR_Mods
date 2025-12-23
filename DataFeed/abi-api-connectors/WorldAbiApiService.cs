@@ -44,18 +44,18 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
 
       // Get platform-specific data (Tags, FileSize, UpdatedAt, CompatibilityVersion)
       PlatformData platformData = null;
-      response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData);
+      var hasPlatformData = response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData) ?? false;
 
       return new WorldAbiApiInfo
       {
         Description = response.Data.Description,
-        Tags = platformData?.Tags ?? new string[0],
+        Tags = hasPlatformData ? platformData.Tags : new string[0],
         Categories = response.Data.Categories?.ToArray(),
-        FileSize = (long)(platformData?.FileSize ?? 0),
+        FileSize = hasPlatformData ? (long)platformData.FileSize : 0,
         UploadedAt = response.Data.UploadedAt,
-        UpdatedAt = platformData?.UpdatedAt ?? response.Data.UploadedAt,
+        UpdatedAt = hasPlatformData ? platformData.UpdatedAt : response.Data.UploadedAt,
         AuthorName = response.Data.Author?.Name,
-        CompatibilityVersion = platformData?.CompatibilityVersion ?? CompatibilityVersions.Invalid,
+        CompatibilityVersion = hasPlatformData ? platformData.CompatibilityVersion : CompatibilityVersions.Invalid,
         Platform = Platforms.Pc_Standalone
       };
     }

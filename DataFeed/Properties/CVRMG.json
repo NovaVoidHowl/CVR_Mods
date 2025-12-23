@@ -1,13 +1,19 @@
 {
   "_id": 227,
   "name": "DataFeed",
-  "modversion": "0.9.3",
+  "modversion": "0.9.4",
   "gameversion": "2025r179",
   "loaderversion": "v0.7.0",
   "modtype": "Mod",
   "author": "NovaVoidHowl",
   "description": "This mod provides a Data Feed of additional parameters from ChilloutVR to avatars via animator and also via localhost REST/Websocket API\nPlease see source link for more information ",
-  "searchtags": ["animator", "parameter", "API", "REST", "Websocket"],
+  "searchtags": [
+    "animator",
+    "parameter",
+    "API",
+    "REST",
+    "Websocket"
+  ],
   "requirements": [],
   "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r6/DataFeed.dll",
   "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/DataFeed",
