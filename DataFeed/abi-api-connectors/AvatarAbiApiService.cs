@@ -1,10 +1,7 @@
-using ABI_RC.Core.Networking;
 using ABI_RC.Core.Networking.API;
 using ABI_RC.Core.Networking.API.Responses;
-using ABI_RC.Core.Networking.API.Responses.CategoriesV2;
-using ABI_RC.Core.Networking.API.Responses.CategoriesV2.User;
 using ABI_RC.Core.Networking.API.Responses.DetailsV2;
-using MelonLoader;
+using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
 {
@@ -12,41 +9,21 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.abi_api_connectors
   {
     public static async Task<AvatarAbiApiInfo> RequestAvatarDetails(string guid)
     {
-      // Check if user is authenticated before making the request
-      if (!AuthManager.IsAuthenticated)
-      {
-        MelonLogger.Warning("[ABI API Call] Cannot fetch avatar details - user is not authenticated");
-        return null;
-      }
+      var payload = new { avatarID = guid };
+      var response = await AbiApiHelper.MakeApiRequest<ContentAvatarResponse>(
+        ApiConnection.ApiOperation.AvatarDetail,
+        payload,
+        "avatar",
+        guid
+      );
 
-      MelonLogger.Msg($"[ABI API Call] Fetching avatar {guid} details...");
-      BaseResponse<ContentAvatarResponse> response;
-      try
-      {
-        var payload = new { avatarID = guid };
-        // Try with API version "2" explicitly as Kafeijao's OSC mod does
-        response = await ApiConnection.MakeRequest<ContentAvatarResponse>(
-          ApiConnection.ApiOperation.AvatarDetail,
-          payload,
-          "2" // Explicitly use API v2
-        );
-      }
-      catch (Exception ex)
-      {
-        MelonLogger.Error($"[ABI API Call] Fetching avatar {guid} details has Failed!");
-        MelonLogger.Error(ex);
-        return null;
-      }
       if (response == null)
       {
-        MelonLogger.Msg($"[ABI API Call] Fetching avatar {guid} details has Failed! Response came back empty.");
         return null;
       }
-      MelonLogger.Msg($"[ABI API Call] Fetched avatar {guid} details successfully!");
 
       // Get platform-specific data (FileSize, UpdatedAt, Tags)
-      PlatformData platformData = null;
-      var hasPlatformData = response.Data.Platforms?.TryGetValue(Platforms.Pc_Standalone, out platformData) ?? false;
+      var hasPlatformData = AbiApiHelper.TryGetPlatformData(response.Data.Platforms, out var platformData);
 
       string authorName = response.Data.Author?.Name;
 
