@@ -70,6 +70,42 @@ the MellonLoader preferences file in the `DataFeed` section
 >
 > You can find the MellonLoader preferences file under your ChilloutVR install folder in `/UserData/MelonPreferences.cfg`
 
+### Data Availability
+
+The same data is not exposed everywhere. Avatar parameters are limited to simple booleans for avatar controllers, while
+the REST and WebSocket APIs expose richer structured data for external tools.
+
+| Data                         | Avatar Parameter | REST Endpoint        | WebSocket Endpoint   |
+| :--------------------------- | :--------------: | :------------------- | :------------------- |
+| `flyingAllowed`              |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `propsAllowed`               |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `portalsAllowed`             |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `nameplatesEnabled`          |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `dataFeedErrorBBCC`          |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `dataFeedErrorMetaPort`      |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `dataFeedDisabled`           |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
+| `dataFeedAPIDisabled`        |       Yes        | No                   | `/api/v1/parameters` |
+| `currentInstanceId`          |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
+| `currentInstanceName`        |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
+| `currentWorldId`             |        No        | `/api/v1/instance`, `/api/v1/world` | `/api/v1/instance`, `/api/v1/world` |
+| `currentInstancePrivacy`     |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
+| `worldDetails`               |        No        | `/api/v1/instance`, `/api/v1/world` | `/api/v1/instance`, `/api/v1/world` |
+| `currentAvatarId`            |        No        | `/api/v1/avatar`     | `/api/v1/avatar`     |
+| `avatarDetails`              |        No        | `/api/v1/avatar`     | `/api/v1/avatar`     |
+| `detailsAvailable`           |        No        | `/api/v1/instance`, `/api/v1/avatar`, `/api/v1/world` | `/api/v1/instance`, `/api/v1/avatar`, `/api/v1/world` |
+| `currentPing`                |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `isConnected`                |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `connectionState`            |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `dataFeedErrorNetworkManager` |       No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `currentFPS`                 |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `voiceCommsPing`             |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `isVoiceConnected`           |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `voiceConnectionState`       |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+| `dataFeedErrorComms`         |        No        | `/api/v1/realtime`   | `/api/v1/realtime`   |
+
+At present, `dataFeedAPIDisabled` is available as an avatar parameter and on the parameters WebSocket payload, but is
+not included in the REST `/api/v1/parameters` payload.
+
 ### Example API output
 
 The following are example outputs from the mod's API endpoints
@@ -167,7 +203,10 @@ The following are example outputs from the mod's API endpoints
   "connectionState": "Connected",
   "dataFeedErrorNetworkManager": false,
   "currentFPS": 60,
-  "voiceCommsPing": 15
+  "voiceCommsPing": 15,
+  "isVoiceConnected": true,
+  "voiceConnectionState": "Connected",
+  "dataFeedErrorComms": false
 }
 ```
 
@@ -198,7 +237,10 @@ REST realtime endpoint:
   "connectionState": "Connected",
   "dataFeedErrorNetworkManager": false,
   "currentFPS": 60,
-  "voiceCommsPing": 15
+  "voiceCommsPing": 15,
+  "isVoiceConnected": true,
+  "voiceConnectionState": "Connected",
+  "dataFeedErrorComms": false
 }
 ```
 
@@ -210,6 +252,9 @@ Where:
 - `dataFeedErrorNetworkManager`: Boolean indicating if there was an error reading NetworkManager data
 - `currentFPS`: Current frames per second of the game
 - `voiceCommsPing`: Voice communications latency in milliseconds (currently returns 0)
+- `isVoiceConnected`: Boolean indicating if connected to voice communications
+- `voiceConnectionState`: String representation of the voice communications connection state
+- `dataFeedErrorComms`: Boolean indicating if there was an error reading voice communications data
 
 ## Example Usage: OBS Overlay
 
