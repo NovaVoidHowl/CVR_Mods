@@ -20,7 +20,8 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       "/api/v1/instance",
       "/api/v1/avatar",
       "/api/v1/world",
-      "/api/v1/realtime"
+      "/api/v1/realtime",
+      "/api/v1/osc"
     };
 
     // API version constants

@@ -25,6 +25,9 @@ The following booleans are exposed so that you can react to the current state of
 
 - dataFeedErrorBBCC - true if the mod is unable to read the BetterBetterCharacterController data set
 - dataFeedErrorMetaPort - true if the mod is unable to read the MetaPort data set
+- dataFeedErrorOSC - true if the mod is unable to read the native OSC state
+- oscEnabled - true if CVR's native OSC setting is enabled
+- oscRunning - true if CVR's native OSC server is currently running
 - dataFeedDisabled - set to true if the whole mod or the avatar parameter output settings are disabled, other wise false
 - dataFeedAPIDisabled - false if the mod's API is enabled, true if the API is disabled or the whole mod is disabled
 
@@ -85,6 +88,17 @@ the REST and WebSocket APIs expose richer structured data for external tools.
 | `dataFeedErrorMetaPort`      |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
 | `dataFeedDisabled`           |       Yes        | `/api/v1/parameters` | `/api/v1/parameters` |
 | `dataFeedAPIDisabled`        |       Yes        | No                   | `/api/v1/parameters` |
+| `oscEnabled`                 |       Yes        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `oscRunning`                 |       Yes        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `dataFeedErrorOSC`           |       Yes        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `oscVerboseLogging`          |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `inboundAddress`             |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `inboundPort`                |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `outboundAddress`            |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `outboundPort`               |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `oscQueryServiceName`        |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `connectedOscClients`        |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `oscClients`                 |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
 | `currentInstanceId`          |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
 | `currentInstanceName`        |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
 | `currentWorldId`             |        No        | `/api/v1/instance`, `/api/v1/world` | `/api/v1/instance`, `/api/v1/world` |
@@ -210,6 +224,40 @@ The following are example outputs from the mod's API endpoints
 }
 ```
 
+#### OSC (`/api/v1/osc`)
+
+```json
+{
+  "oscEnabled": true,
+  "oscRunning": true,
+  "oscVerboseLogging": false,
+  "inboundAddress": "0.0.0.0",
+  "inboundPort": 9000,
+  "outboundAddress": "127.0.0.1",
+  "outboundPort": 9001,
+  "oscQueryServiceName": "ChilloutVR-GameClient-ABC123",
+  "connectedOscClients": 1,
+  "oscClients": [
+    {
+      "serviceId": "example-client",
+      "oscAddress": "127.0.0.1",
+      "oscPort": 9002,
+      "httpAddress": "127.0.0.1",
+      "httpPort": 12345,
+      "hasAvatarModule": true,
+      "hasInputModule": false,
+      "hasChatBoxModule": true
+    }
+  ],
+  "dataFeedErrorOSC": false
+}
+```
+
+> [!NOTE]
+>
+> `connectedOscClients` and `oscClients` only include clients discovered through OSCQuery.
+> Plain OSC-only tools may still send to or receive from CVR without appearing in the client list.
+
 ### WebSocket Endpoints
 
 The WebSocket API provides several endpoints for different types of data:
@@ -219,6 +267,7 @@ The WebSocket API provides several endpoints for different types of data:
 - `/api/v1/avatar` - Current avatar information (updated when switching avatars)
 - `/api/v1/world` - Current world details from ChilloutVR API (updated when switching worlds)
 - `/api/v1/realtime` - Real-time data updates (ping, FPS, connection status)
+- `/api/v1/osc` - Native ChilloutVR OSC status, ports, and OSCQuery-discovered client summaries
 
 > [!TIP]
 >

@@ -95,11 +95,23 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Models
   {
     private bool _dataFeedErrorBBCC;
     private bool _dataFeedErrorMetaPort;
+    private bool _dataFeedErrorOSC;
+    private bool _oscEnabled;
+    private bool _oscRunning;
 
-    public PlatformStateParameters(bool dataFeedErrorBBCC, bool dataFeedErrorMetaPort)
+    public PlatformStateParameters(
+      bool dataFeedErrorBBCC,
+      bool dataFeedErrorMetaPort,
+      bool dataFeedErrorOSC,
+      bool oscEnabled,
+      bool oscRunning
+    )
     {
       _dataFeedErrorBBCC = dataFeedErrorBBCC;
       _dataFeedErrorMetaPort = dataFeedErrorMetaPort;
+      _dataFeedErrorOSC = dataFeedErrorOSC;
+      _oscEnabled = oscEnabled;
+      _oscRunning = oscRunning;
     }
 
 #pragma warning disable S2292
@@ -113,6 +125,24 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Models
     {
       get => _dataFeedErrorMetaPort;
       set => _dataFeedErrorMetaPort = value;
+    }
+
+    public bool DataFeedErrorOSC
+    {
+      get => _dataFeedErrorOSC;
+      set => _dataFeedErrorOSC = value;
+    }
+
+    public bool OSCEnabled
+    {
+      get => _oscEnabled;
+      set => _oscEnabled = value;
+    }
+
+    public bool OSCRunning
+    {
+      get => _oscRunning;
+      set => _oscRunning = value;
     }
 #pragma warning restore S2292
   }

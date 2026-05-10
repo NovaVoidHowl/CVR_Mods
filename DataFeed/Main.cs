@@ -65,6 +65,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     private readonly INetworkManagerDataReader _networkManagerReader;
     private readonly ICommsDataReader _commsReader;
     private readonly IFPSDataReader _fpsReader;
+    private readonly IOSCDataReader _oscReader;
 
     // Network update throttling (similar to game menu)
     private float _timeLastNetworkUpdate = 0f;
@@ -77,6 +78,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       _networkManagerReader = new NetworkManagerDataReader();
       _commsReader = new CommsDataReader();
       _fpsReader = new FPSDataReader();
+      _oscReader = new OSCDataReader();
     }
 
     // Expose the interface readers
@@ -85,6 +87,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public INetworkManagerDataReader NetworkManagerReader => _networkManagerReader;
     public ICommsDataReader CommsReader => _commsReader;
     public IFPSDataReader FPSReader => _fpsReader;
+    public IOSCDataReader OSCReader => _oscReader;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -204,6 +207,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         _networkManagerReader.UpdateNetworkManagerState();
         _commsReader.UpdateCommsState();
         _fpsReader.UpdateFPS();
+        if (_oscReader.UpdateOSCState())
+        {
+          OnStateChanged();
+          SetAvatarParameters();
+        }
         _timeLastNetworkUpdate = Time.time;
       }
     }
@@ -393,6 +401,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       stateChanged |= _bbccReader.UpdateBBCCState();
       stateChanged |= _metaPortReader.UpdateMetaPortState();
       stateChanged |= _networkManagerReader.UpdateNetworkManagerState();
+      stateChanged |= _oscReader.UpdateOSCState();
 
       if (stateChanged)
       {
@@ -414,7 +423,10 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
 
       var platformState = new PlatformStateParameters(
         BBCCReader.DataFeedErrorBBCC,
-        MetaPortReader.DataFeedErrorMetaPort
+        MetaPortReader.DataFeedErrorMetaPort,
+        OSCReader.DataFeedErrorOSC,
+        OSCReader.OSCEnabled,
+        OSCReader.OSCRunning
       );
 
       _avatarParameterManager.SetParameters(worldRules, modStatus, platformState);
@@ -433,6 +445,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       MelonLogger.Msg("Data Feed Status:");
       MelonLogger.Msg("BBCC Error: " + BBCCReader.DataFeedErrorBBCC);
       MelonLogger.Msg("MetaPort Error: " + MetaPortReader.DataFeedErrorMetaPort);
+      MelonLogger.Msg("OSC Enabled: " + OSCReader.OSCEnabled);
+      MelonLogger.Msg("OSC Running: " + OSCReader.OSCRunning);
+      MelonLogger.Msg("OSC Error: " + OSCReader.DataFeedErrorOSC);
       MelonLogger.Msg("Data Feed Disabled: " + DataFeedDisabled);
     }
 
@@ -479,6 +494,26 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         currentAvatarId = CurrentAvatarId,
         avatarDetails = CurrentAvatarDetails ?? new AvatarAbiApiInfo(),
         detailsAvailable = CurrentAvatarDetails != null
+      };
+    }
+
+    public object GetCurrentOSCData()
+    {
+      _oscReader.UpdateOSCState();
+
+      return new
+      {
+        oscEnabled = OSCReader.OSCEnabled,
+        oscRunning = OSCReader.OSCRunning,
+        oscVerboseLogging = OSCReader.OSCVerboseLogging,
+        inboundAddress = OSCReader.InboundAddress,
+        inboundPort = OSCReader.InboundPort,
+        outboundAddress = OSCReader.OutboundAddress,
+        outboundPort = OSCReader.OutboundPort,
+        oscQueryServiceName = OSCReader.OSCQueryServiceName,
+        connectedOscClients = OSCReader.ConnectedOSCClients,
+        oscClients = OSCReader.OSCClients,
+        dataFeedErrorOSC = OSCReader.DataFeedErrorOSC
       };
     }
   }

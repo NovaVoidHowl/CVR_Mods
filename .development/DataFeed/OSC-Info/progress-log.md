@@ -16,11 +16,16 @@
 - Decided the OSC API should expose both `connectedOscClients` and a lightweight `oscClients` array with service ID,
   endpoints, and advertised module flags.
 - Noted that OSC client details only cover OSCQuery-discovered clients; plain OSC connections may not appear.
+- Implemented `OSCDataReader`, `IOSCDataReader`, and lightweight `OSCClientInfo` API model.
+- Added OSC status wiring to DataFeed update state and avatar parameters.
+- Added `/api/v1/osc` REST and WebSocket endpoints.
+- Updated `DataFeed/README.md` with OSC endpoint data availability and example output.
+- Verified with `dotnet build NVH_CVR_Mods.sln`; build and ILRepack completed successfully.
 
 ## Current Status
 
-Planning complete for the initial implementation. No production code changes have been made yet.
+Initial implementation complete.
 
 ## Next Step
 
-Begin implementation from `implementation-plan.md`.
+Test in ChilloutVR with native OSC disabled, enabled, and with an OSCQuery-capable client connected.

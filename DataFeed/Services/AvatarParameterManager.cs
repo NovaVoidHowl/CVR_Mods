@@ -36,6 +36,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       // mod status data feed
       animator.SetParameter("dataFeedErrorBBCC", false);
       animator.SetParameter("dataFeedErrorMetaPort", false);
+      animator.SetParameter("dataFeedErrorOSC", false);
+      animator.SetParameter("oscEnabled", false);
+      animator.SetParameter("oscRunning", false);
       animator.SetParameter("dataFeedDisabled", true);
       animator.SetParameter("dataFeedAPIDisabled", true);
     }
@@ -57,6 +60,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       // Platform state
       animator.SetParameter("dataFeedErrorBBCC", platformState.DataFeedErrorBBCC);
       animator.SetParameter("dataFeedErrorMetaPort", platformState.DataFeedErrorMetaPort);
+      animator.SetParameter("dataFeedErrorOSC", platformState.DataFeedErrorOSC);
+      animator.SetParameter("oscEnabled", platformState.OSCEnabled);
+      animator.SetParameter("oscRunning", platformState.OSCRunning);
 
       // Mod status
       animator.SetParameter("dataFeedDisabled", modStatus.DataFeedDisabled);
