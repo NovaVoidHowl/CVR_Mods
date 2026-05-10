@@ -15,18 +15,27 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
     {
       if (!modStatus.IsEnabled || !worldRules.AvatarParamSetEnabled)
       {
-        SetDefaultParameters();
-        MelonLogger.Msg("Avatar Data Feed Disabled, Parameters set to default.");
+        if (SetDefaultParameters())
+        {
+          MelonLogger.Msg("Avatar Data Feed Disabled, Parameters set to default.");
+        }
         return;
       }
 
-      SetActiveParameters(worldRules, modStatus, platformState);
-      MelonLogger.Msg("Avatar Parameters Set.");
+      if (SetActiveParameters(worldRules, modStatus, platformState))
+      {
+        MelonLogger.Msg("Avatar Parameters Set.");
+      }
     }
 
-    private static void SetDefaultParameters()
+    private static bool SetDefaultParameters()
     {
-      var animator = PlayerSetup.Instance.AnimatorManager;
+      var animator = PlayerSetup.Instance?.AnimatorManager;
+      if (animator == null)
+      {
+        return false;
+      }
+
       // main data feed
       animator.SetParameter("flyingAllowed", true);
       animator.SetParameter("propsAllowed", true);
@@ -41,15 +50,20 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       animator.SetParameter("oscRunning", false);
       animator.SetParameter("dataFeedDisabled", true);
       animator.SetParameter("dataFeedAPIDisabled", true);
+      return true;
     }
 
-    private static void SetActiveParameters(
+    private static bool SetActiveParameters(
       WorldRuleParameters worldRules,
       ModStatusParameters modStatus,
       PlatformStateParameters platformState
     )
     {
-      var animator = PlayerSetup.Instance.AnimatorManager;
+      var animator = PlayerSetup.Instance?.AnimatorManager;
+      if (animator == null)
+      {
+        return false;
+      }
 
       // World rules - these parameter names match existing avatar implementations
       animator.SetParameter("flyingAllowed", worldRules.FlyingAllowed);
@@ -67,6 +81,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.Services
       // Mod status
       animator.SetParameter("dataFeedDisabled", modStatus.DataFeedDisabled);
       animator.SetParameter("dataFeedAPIDisabled", modStatus.DataFeedAPIDisabled);
+      return true;
     }
   }
 }
