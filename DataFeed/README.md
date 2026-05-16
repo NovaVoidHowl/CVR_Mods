@@ -274,7 +274,7 @@ The following are example outputs from the mod's API endpoints
   "oscRunning": true,
   "currentAvatarId": "avtr-example",
   "knownParameterCount": 2,
-  "recentMessageCount": 0,
+  "recentMessageCount": 2,
   "parameters": [
     {
       "name": "HeartRate",
@@ -295,15 +295,48 @@ The following are example outputs from the mod's API endpoints
       "appliedToAvatar": true
     }
   ],
-  "recentMessages": [],
+  "recentMessages": [
+    {
+      "address": "/avatar/parameters/HeartRate",
+      "parameterName": "HeartRate",
+      "argumentCount": 1,
+      "arguments": [
+        {
+          "valueType": "float",
+          "value": 82.0
+        }
+      ],
+      "receivedAt": "2026-05-16T14:20:12.520Z",
+      "handledByCVR": true,
+      "appliedToAvatar": true,
+      "reason": "Applied to current avatar"
+    },
+    {
+      "address": "/avatar/parameters/BadName",
+      "parameterName": "BadName",
+      "argumentCount": 1,
+      "arguments": [
+        {
+          "valueType": "int",
+          "value": 1
+        }
+      ],
+      "receivedAt": "2026-05-16T14:20:15.000Z",
+      "handledByCVR": true,
+      "appliedToAvatar": false,
+      "reason": "Accepted by CVR avatar OSC handler; avatar application not confirmed"
+    }
+  ],
   "dataFeedErrorOSCParameters": false
 }
 ```
 
 > [!NOTE]
 >
-> Stage 1 records OSC avatar parameter values after CVR applies them to the current avatar.
-> `recentMessages` is reserved for Stage 2 raw receive diagnostics, so it will stay empty until that hook is added.
+> `parameters` records OSC avatar parameter values after CVR applies them to the current avatar.
+> `recentMessages` records raw `/avatar/parameters/...` messages that reached CVR's avatar OSC handler.
+> `handledByCVR` means CVR accepted the OSC address and argument shape; `appliedToAvatar` confirms a matching current
+> avatar parameter was updated.
 > OSC parameter diagnostic state is cleared when the local avatar changes.
 
 ### WebSocket Endpoints
@@ -316,7 +349,7 @@ The WebSocket API provides several endpoints for different types of data:
 - `/api/v1/world` - Current world details from ChilloutVR API (updated when switching worlds)
 - `/api/v1/realtime` - Real-time data updates (ping, FPS, connection status)
 - `/api/v1/osc` - Native ChilloutVR OSC status, ports, and OSCQuery-discovered client summaries
-- `/api/v1/osc-parameters` - Applied OSC avatar parameter diagnostics
+- `/api/v1/osc-parameters` - OSC avatar parameter receive/apply diagnostics
 
 > [!TIP]
 >

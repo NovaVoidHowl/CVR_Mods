@@ -18,7 +18,7 @@
 
 ## Current Status
 
-Stage 1 implementation is in progress.
+Stage 2 implementation is in progress.
 
 Completed so far:
 
@@ -31,7 +31,13 @@ Completed so far:
 - Added avatar-change clearing for OSC parameter diagnostics.
 - Updated the DataFeed README with Stage 1 endpoint documentation.
 - Verified Stage 1 with `dotnet build DataFeed/DataFeed.csproj -c Release`.
+- Added Harmony prefix/postfix tracking for `OSCAvatarModule.HandleIncoming(OscMessage packet)`.
+- Added bounded raw receive diagnostics through `recentMessages`.
+- Added JSON-safe argument serialization with dynamic verbose/truncated string output.
+- Added best-effort correlation between raw received messages and applied avatar parameter events.
+- Updated the DataFeed README with Stage 2 recent-message diagnostics.
+- Verified Stage 2 with `dotnet build DataFeed/DataFeed.csproj -c Release`.
 
 ## Next Step
 
-Test Stage 1 in CVR, then continue to Stage 2 with the raw `HandleIncoming` diagnostic hook.
+Test Stage 2 in CVR with valid parameters, missing parameters, unsupported argument types, and avatar changes.

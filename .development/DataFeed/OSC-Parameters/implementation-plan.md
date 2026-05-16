@@ -289,8 +289,9 @@ Update `DataFeed/README.md` with:
 - WebSocket endpoint `/api/v1/osc-parameters`
 - Example JSON payload
 - Explanation of `appliedToAvatar`
-- Note that the initial implementation only sees parameters CVR applies to the current avatar
-- Note that raw receive diagnostics require the optional `HandleIncoming` hook
+- Explanation of `handledByCVR`
+- Note that `parameters` contains values CVR applied to the current avatar
+- Note that `recentMessages` contains raw receive diagnostics from the `HandleIncoming` hook
 - Preference documentation for recent-message capacity, verbose argument output, and default string truncation
 
 ## Validation
