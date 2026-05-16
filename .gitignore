@@ -3,6 +3,7 @@
 obj/
 bin/
 NStrip.exe
+scripts/NStrip.exe
 lib_names
 .ManagedLibs/*.dll
 .ManagedLibs/*.db

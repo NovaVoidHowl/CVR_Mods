@@ -101,29 +101,56 @@ feel free to leave bug reports or feature requests!
 
 ## Building
 
-In order to build the mods in this project:
+The repo includes a `Makefile` with the common build commands. Run `make help` to see the available targets.
+
+For DataFeed, the usual flow on either Windows or Linux is:
+
+```shell
+make datafeed
+```
+
+Useful targets:
+
+- `make managed-libs` copies the required CVR and MelonLoader DLLs into `/.ManagedLibs` and runs NStrip.
+- `make managed-libs-no-strip` copies the DLLs without running NStrip.
+- `make build-datafeed` builds `DataFeed.dll` into your ChilloutVR `Mods` folder.
+- `make datafeed` runs `managed-libs`, then `build-datafeed`.
+
+In order to build the mods in this project on Windows:
 
 - (1) Install `NStrip.exe` from <https://github.com/BepInEx/NStrip> into this directory (or into your PATH). This tools
   converts all assembly symbols to public ones! If you don't strip the dlls, you won't be able to compile some mods.
 - (2) If your ChilloutVR folder is `C:\Program Files (x86)\Steam\steamapps\common\ChilloutVR` you can ignore this step.
   Otherwise follow the instructions bellow
   to [Set CVR Folder Environment Variable](#set-cvr-folder-environment-variable)
-- (3) Run `copy_and_nstrip_dll.ps1` on the Power Shell. This will copy the required CVR, MelonLoader, and Mod DLLs into
+- (3) Run `make managed-libs` or `scripts/copy_and_nstrip_dll.ps1` on PowerShell. This will copy the required CVR, MelonLoader, and Mod DLLs into
   this project's `/.ManagedLibs`. Note if some of the required mods are not found, it will display the url from the CVR
   Modding Group API so you can download.
+- (4) Build the project with `make build-datafeed`, Visual Studio, or `dotnet build`.
+
+On Linux:
+
+- (1) Install `NStrip.exe` into this directory or into your PATH. If you use the Windows `.exe` release, install `mono`
+  so the helper script can run it.
+- (2) Set `CVRPATH` if ChilloutVR is not in one of the common Steam Linux locations:
+  `export CVRPATH="$HOME/.local/share/Steam/steamapps/common/ChilloutVR"`
+- (3) Run `make managed-libs` or `./scripts/copy_and_nstrip_dll.sh`. This copies the same MelonLoader and CVR managed DLLs into `/.ManagedLibs` and
+  regenerates `References.Items.props` with cross-platform paths.
+- (4) Build the mod:
+  `make build-datafeed` or `./scripts/build_datafeed.sh`
 
 ### Set CVR Folder Environment Variable
 
 To build the project you need `CVRPATH` to be set to your ChilloutVR Folder, so we get the path to grab the libraries
-we need to compile. By running the `copy_and_nstrip_dll.ps1` script that env variable is set automatically, but only
+we need to compile. By running the `scripts/copy_and_nstrip_dll.ps1` script that env variable is set automatically, but only
 works if the ChilloutVR folder is on the default location `C:\Program Files (x86)\Steam\steamapps\common\ChilloutVR`.
 
 Otherwise you need to set the `CVRPATH` env variable yourself, you can do that by either updating the default path in
-the `copy_and_nstrip_dll.ps1` and then run it, or manually set it via the windows menus.
+the `scripts/copy_and_nstrip_dll.ps1` and then run it, or manually set it via the windows menus.
 
-#### Setup via editing copy_and_nstrip_dll.ps1
+#### Setup via editing scripts/copy_and_nstrip_dll.ps1
 
-Edit `copy_and_nstrip_dll.ps1` and look the line bellow, and then replace the Path with your actual path.
+Edit `scripts/copy_and_nstrip_dll.ps1` and look the line bellow, and then replace the Path with your actual path.
 `$cvrDefaultPath = "C:\Program Files (x86)\Steam\steamapps\common\ChilloutVR"`
 
 You'll probably need to restart your computer so the Environment Variable variable gets updated...

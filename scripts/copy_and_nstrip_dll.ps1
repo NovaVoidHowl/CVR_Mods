@@ -1,6 +1,7 @@
 param(
     # Whether it should ask user for inputs to proceed or in should run the whole script without prompting
-    [switch]$silent = $false
+    [switch]$silent = $false,
+    [switch]$skipNStrip = $false
 )
 
 # CVR and Melon Loader Dependencies
@@ -44,7 +45,8 @@ else {
 }
 
 $scriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$managedLibsFolder = $scriptDir + "\.ManagedLibs"
+$repoRoot = Split-Path -Parent -Path $scriptDir
+$managedLibsFolder = Join-Path -Path $repoRoot -ChildPath ".ManagedLibs"
 
 if (!(Test-Path $managedLibsFolder)) {
     New-Item -ItemType Directory -Path $managedLibsFolder
@@ -68,14 +70,14 @@ $indent = '  '  # 2 spaces
 $lib_names_xml = "<Project>`n${indent}<ItemGroup>`n"
 
 # Manually add references with specific paths and settings
-$lib_names_xml += "${indent}${indent}<Reference Include=`"0Harmony`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)\.ManagedLibs\0Harmony.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
-$lib_names_xml += "${indent}${indent}<Reference Include=`"MelonLoader`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)\.ManagedLibs\MelonLoader.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
-$lib_names_xml += "${indent}${indent}<Reference Include=`"Mono.Cecil`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)\.ManagedLibs\Mono.Cecil.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
+$lib_names_xml += "${indent}${indent}<Reference Include=`"0Harmony`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)/.ManagedLibs/0Harmony.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
+$lib_names_xml += "${indent}${indent}<Reference Include=`"MelonLoader`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)/.ManagedLibs/MelonLoader.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
+$lib_names_xml += "${indent}${indent}<Reference Include=`"Mono.Cecil`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)/.ManagedLibs/Mono.Cecil.dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
 
 # Iterate over files in a specified directory, adding them as references if not in the ignore list
 foreach ($file in Get-ChildItem $cvrPath$cvrManagedDataPath"\*") {
     if ($cvrManagedLibNamesToIgnore -notcontains $file.BaseName) {
-        $lib_names_xml += "${indent}${indent}<Reference Include=`"$($file.BaseName)`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)\.ManagedLibs\$($file.BaseName).dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
+        $lib_names_xml += "${indent}${indent}<Reference Include=`"$($file.BaseName)`">`n${indent}${indent}${indent}<HintPath>`$(MsBuildThisFileDirectory)/.ManagedLibs/$($file.BaseName).dll</HintPath>`n${indent}${indent}${indent}<Private>False</Private>`n${indent}${indent}</Reference>`n"
     }
 }
 
@@ -83,7 +85,8 @@ foreach ($file in Get-ChildItem $cvrPath$cvrManagedDataPath"\*") {
 $lib_names_xml += "${indent}</ItemGroup>`n</Project>"
 
 # Output the constructed XML content to a file with UTF8 encoding
-$lib_names_xml | Out-File -Encoding UTF8 -FilePath "References.Items.props"
+$referencesFile = Join-Path -Path $repoRoot -ChildPath "References.Items.props"
+$lib_names_xml | Out-File -Encoding UTF8 -FilePath $referencesFile
 
 Write-Host ""
 Write-Host "Generated References.Items.props file containing the references to all common ManagedLibs"
@@ -144,6 +147,11 @@ Write-Host ""
 Write-Host "Copied all libraries!"
 Write-Host ""
 
+if ($skipNStrip) {
+    Write-Host "Skipping NStrip because -skipNStrip was provided."
+    return
+}
+
 if (-not $silent) {
     Write-Host "Press any key to strip the Dlls using NStrip"
     $HOST.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | OUT-NULL
@@ -153,8 +161,14 @@ if (-not $silent) {
 Write-Host "NStrip Convert all private/protected stuff to public. Requires <AllowUnsafeBlocks>true></AllowUnsafeBlocks>"
 
 # Check if NStrip.exe exists in the current directory
-if(Test-Path -Path ".\NStrip.exe") {
-    $nStripPath = ".\NStrip.exe"
+$repoNStripPath = Join-Path -Path $repoRoot -ChildPath "NStrip.exe"
+$scriptNStripPath = Join-Path -Path $scriptDir -ChildPath "NStrip.exe"
+
+if(Test-Path -Path $repoNStripPath) {
+    $nStripPath = $repoNStripPath
+}
+elseif(Test-Path -Path $scriptNStripPath) {
+    $nStripPath = $scriptNStripPath
 }
 else {
     # Try to locate NStrip.exe in the PATH

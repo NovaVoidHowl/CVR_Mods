@@ -4,7 +4,7 @@
       "args": [
         "-ExecutionPolicy",
         "Bypass",
-        "./.run-csharpier.ps1",
+        "./scripts/run-csharpier.ps1",
         "${staged}"
       ],
       "command": "powershell",

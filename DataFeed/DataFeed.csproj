@@ -3,6 +3,7 @@
   <!-- NuGet packages with specific versions -->
   <ItemGroup>
     <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.31" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
     <PackageReference Include="EmbedIO" Version="3.5.2" />

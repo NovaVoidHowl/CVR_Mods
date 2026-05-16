@@ -17,10 +17,10 @@
     If specified, shows what would be changed without actually modifying files.
 
 .EXAMPLE
-    .\sync-cvrmg-metadata.ps1
+    .\scripts\sync-cvrmg-metadata.ps1
 
 .EXAMPLE
-    .\sync-cvrmg-metadata.ps1 -DryRun
+    .\scripts\sync-cvrmg-metadata.ps1 -DryRun
 #>
 
 param(
@@ -136,7 +136,7 @@ if ($DryRun) {
 }
 
 # Find all mod directories (directories containing both AssemblyInfo.cs and CVRMG.json in Properties folder)
-$rootPath = $PSScriptRoot
+$rootPath = Split-Path -Parent -Path $PSScriptRoot
 $modDirs = Get-ChildItem -Path $rootPath -Directory | Where-Object {
     $propertiesPath = Join-Path $_.FullName "Properties"
     $assemblyInfoPath = Join-Path $propertiesPath "AssemblyInfo.cs"
