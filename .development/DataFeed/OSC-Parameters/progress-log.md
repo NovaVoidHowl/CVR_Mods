@@ -18,9 +18,20 @@
 
 ## Current Status
 
-Planning complete. No runtime implementation has been started for this feature.
+Stage 1 implementation is in progress.
+
+Completed so far:
+
+- Added API models for OSC parameter values, raw-message placeholders, and arguments.
+- Added `IOSCParameterDataReader`.
+- Added `OSCParameterDataReader` using CVR's incoming avatar parameter events.
+- Added MelonPreferences entries for recent-message capacity, verbose arguments, and argument string limit.
+- Added `/api/v1/osc-parameters` REST endpoint.
+- Added `/api/v1/osc-parameters` WebSocket endpoint.
+- Added avatar-change clearing for OSC parameter diagnostics.
+- Updated the DataFeed README with Stage 1 endpoint documentation.
+- Verified Stage 1 with `dotnet build DataFeed/DataFeed.csproj -c Release`.
 
 ## Next Step
 
-Implement Stage 1 using CVR's incoming avatar parameter events, compile it, test it in CVR, then continue to Stage 2 with
-the raw `HandleIncoming` diagnostic hook.
+Test Stage 1 in CVR, then continue to Stage 2 with the raw `HandleIncoming` diagnostic hook.

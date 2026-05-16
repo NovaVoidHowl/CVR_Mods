@@ -44,6 +44,9 @@ NOTE: if the `dataFeedDisabled` is true you should disregard the values passed b
 |           API Enable            | Turns on/off the websocket and REST API endpoints                        |
 |          REST API Port          | The REST API endpoint port on your system                                |
 |       Websocket API Port        | The websocket API endpoint port on your system                           |
+| OSC Parameter Recent Message Capacity | Maximum recent OSC avatar parameter messages retained for diagnostics |
+| OSC Parameter Verbose Arguments | Enables full argument values for OSC avatar parameter diagnostics         |
+| OSC Parameter Argument String Limit | Maximum string length when verbose OSC argument output is disabled    |
 
 ### API Key
 
@@ -99,6 +102,11 @@ the REST and WebSocket APIs expose richer structured data for external tools.
 | `oscQueryServiceName`        |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
 | `connectedOscClients`        |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
 | `oscClients`                 |        No        | `/api/v1/osc`        | `/api/v1/osc`        |
+| `knownParameterCount`        |        No        | `/api/v1/osc-parameters` | `/api/v1/osc-parameters` |
+| `recentMessageCount`         |        No        | `/api/v1/osc-parameters` | `/api/v1/osc-parameters` |
+| `parameters`                 |        No        | `/api/v1/osc-parameters` | `/api/v1/osc-parameters` |
+| `recentMessages`             |        No        | `/api/v1/osc-parameters` | `/api/v1/osc-parameters` |
+| `dataFeedErrorOSCParameters` |        No        | `/api/v1/osc-parameters` | `/api/v1/osc-parameters` |
 | `currentInstanceId`          |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
 | `currentInstanceName`        |        No        | `/api/v1/instance`   | `/api/v1/instance`   |
 | `currentWorldId`             |        No        | `/api/v1/instance`, `/api/v1/world` | `/api/v1/instance`, `/api/v1/world` |
@@ -258,6 +266,46 @@ The following are example outputs from the mod's API endpoints
 > `connectedOscClients` and `oscClients` only include clients discovered through OSCQuery.
 > Plain OSC-only tools may still send to or receive from CVR without appearing in the client list.
 
+#### OSC Parameters (`/api/v1/osc-parameters`)
+
+```json
+{
+  "oscEnabled": true,
+  "oscRunning": true,
+  "currentAvatarId": "avtr-example",
+  "knownParameterCount": 2,
+  "recentMessageCount": 0,
+  "parameters": [
+    {
+      "name": "HeartRate",
+      "address": "/avatar/parameters/HeartRate",
+      "valueType": "float",
+      "lastValue": 82.0,
+      "lastReceivedAt": "2026-05-16T14:20:12.533Z",
+      "receivedCount": 42,
+      "appliedToAvatar": true
+    },
+    {
+      "name": "ToggleThing",
+      "address": "/avatar/parameters/ToggleThing",
+      "valueType": "bool",
+      "lastValue": true,
+      "lastReceivedAt": "2026-05-16T14:20:14.120Z",
+      "receivedCount": 3,
+      "appliedToAvatar": true
+    }
+  ],
+  "recentMessages": [],
+  "dataFeedErrorOSCParameters": false
+}
+```
+
+> [!NOTE]
+>
+> Stage 1 records OSC avatar parameter values after CVR applies them to the current avatar.
+> `recentMessages` is reserved for Stage 2 raw receive diagnostics, so it will stay empty until that hook is added.
+> OSC parameter diagnostic state is cleared when the local avatar changes.
+
 ### WebSocket Endpoints
 
 The WebSocket API provides several endpoints for different types of data:
@@ -268,6 +316,7 @@ The WebSocket API provides several endpoints for different types of data:
 - `/api/v1/world` - Current world details from ChilloutVR API (updated when switching worlds)
 - `/api/v1/realtime` - Real-time data updates (ping, FPS, connection status)
 - `/api/v1/osc` - Native ChilloutVR OSC status, ports, and OSCQuery-discovered client summaries
+- `/api/v1/osc-parameters` - Applied OSC avatar parameter diagnostics
 
 > [!TIP]
 >

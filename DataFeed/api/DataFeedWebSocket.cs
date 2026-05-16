@@ -274,4 +274,37 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       }
     }
   }
+
+  public class DataFeedOSCParametersWebSocketV1 : DataFeedWebSocketBase
+  {
+    private bool _isRunning = true;
+
+    public DataFeedOSCParametersWebSocketV1(DataFeed dataFeed)
+      : base(dataFeed) { }
+
+    protected override string GetConnectionType() => "OSC parameter data";
+
+    protected override void SendInitialData() => _ = SendOSCParameterData();
+
+    protected override void OnClose(CloseEventArgs e)
+    {
+      _isRunning = false;
+      base.OnClose(e);
+    }
+
+    protected override void OnMessage(MessageEventArgs e)
+    {
+      if (e.Data == "get_osc_parameters")
+        SendJsonData(_dataFeed.GetCurrentOSCParameterData());
+    }
+
+    private async Task SendOSCParameterData()
+    {
+      while (_isRunning)
+      {
+        SendJsonData(_dataFeed.GetCurrentOSCParameterData());
+        await Task.Delay(1000);
+      }
+    }
+  }
 }

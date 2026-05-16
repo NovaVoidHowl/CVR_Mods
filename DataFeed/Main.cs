@@ -31,6 +31,9 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public MelonPreferences_Entry<string> meRestAPIPort;
     public MelonPreferences_Entry<string> meWebsocketAPIPort;
     public MelonPreferences_Entry<string> meAPIKey;
+    public MelonPreferences_Entry<int> meOSCParameterRecentMessageCapacity;
+    public MelonPreferences_Entry<bool> meOSCParameterVerboseArguments;
+    public MelonPreferences_Entry<int> meOSCParameterArgumentStringLimit;
 #pragma warning restore S1104
 
     // Data Feed Vars
@@ -66,6 +69,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     private readonly ICommsDataReader _commsReader;
     private readonly IFPSDataReader _fpsReader;
     private readonly IOSCDataReader _oscReader;
+    private readonly IOSCParameterDataReader _oscParameterReader;
 
     // Network update throttling (similar to game menu)
     private float _timeLastNetworkUpdate = 0f;
@@ -79,6 +83,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       _commsReader = new CommsDataReader();
       _fpsReader = new FPSDataReader();
       _oscReader = new OSCDataReader();
+      _oscParameterReader = new OSCParameterDataReader();
     }
 
     // Expose the interface readers
@@ -88,6 +93,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
     public ICommsDataReader CommsReader => _commsReader;
     public IFPSDataReader FPSReader => _fpsReader;
     public IOSCDataReader OSCReader => _oscReader;
+    public IOSCParameterDataReader OSCParameterReader => _oscParameterReader;
 
     // On Melon Load
     public override void OnInitializeMelon()
@@ -128,6 +134,21 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         description: "API Key to access the local DataFeed server",
         is_hidden: true // hide the key from the UI to prevent accidental leaks
       );
+      meOSCParameterRecentMessageCapacity = _MelonCategoryDataFeed.CreateEntry(
+        "OSC Parameter Recent Message Capacity",
+        128,
+        description: "Maximum number of recent OSC avatar parameter messages retained for diagnostics."
+      );
+      meOSCParameterVerboseArguments = _MelonCategoryDataFeed.CreateEntry(
+        "OSC Parameter Verbose Arguments",
+        false,
+        description: "Include full OSC argument values in recent OSC avatar parameter diagnostics."
+      );
+      meOSCParameterArgumentStringLimit = _MelonCategoryDataFeed.CreateEntry(
+        "OSC Parameter Argument String Limit",
+        128,
+        description: "Maximum string length for OSC avatar parameter diagnostic arguments when verbose output is disabled."
+      );
 
       // Force save preferences to file so users don't need to change a setting first
       MelonPreferences.Save();
@@ -166,6 +187,27 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
           OnMeWebsocketAPIPortChanged(oldValue, newValue);
         }
       );
+      meOSCParameterRecentMessageCapacity.OnEntryValueChanged.Subscribe(
+        (oldValue, newValue) =>
+        {
+          OnMeOSCParameterPreferenceChanged();
+        }
+      );
+      meOSCParameterVerboseArguments.OnEntryValueChanged.Subscribe(
+        (oldValue, newValue) =>
+        {
+          OnMeOSCParameterPreferenceChanged();
+        }
+      );
+      meOSCParameterArgumentStringLimit.OnEntryValueChanged.Subscribe(
+        (oldValue, newValue) =>
+        {
+          OnMeOSCParameterPreferenceChanged();
+        }
+      );
+
+      ConfigureOSCParameterReader();
+      _oscParameterReader.Initialize();
 
       // Event Listeners CVR,
       // Note: more of these these can be found in the CVRGameEventSystem class under the
@@ -211,6 +253,11 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         {
           OnStateChanged();
           SetAvatarParameters();
+        }
+        ConfigureOSCParameterReader();
+        if (_oscParameterReader.UpdateOSCParameterState())
+        {
+          OnStateChanged();
         }
         _timeLastNetworkUpdate = Time.time;
       }
@@ -314,6 +361,21 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       }
     }
 
+    private void OnMeOSCParameterPreferenceChanged()
+    {
+      ConfigureOSCParameterReader();
+      OnStateChanged();
+    }
+
+    private void ConfigureOSCParameterReader()
+    {
+      _oscParameterReader.Configure(
+        meOSCParameterRecentMessageCapacity.Value,
+        meOSCParameterVerboseArguments.Value,
+        meOSCParameterArgumentStringLimit.Value
+      );
+    }
+
     private async void OnInstanceConnected(string message)
     {
       // Update MetaPort data immediately to get current world information
@@ -379,6 +441,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       {
         currentAvatarId = avatarId;
         currentAvatarDetails = avatarDetails;
+        _oscParameterReader.Clear();
 
         UpdateDataFeed();
         PrintCurrentDataFeedValues();
@@ -402,6 +465,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       stateChanged |= _metaPortReader.UpdateMetaPortState();
       stateChanged |= _networkManagerReader.UpdateNetworkManagerState();
       stateChanged |= _oscReader.UpdateOSCState();
+      stateChanged |= _oscParameterReader.UpdateOSCParameterState();
 
       if (stateChanged)
       {
@@ -456,6 +520,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
       // any on quit code here, ie closing connections etc
 
       apiServer?.Stop();
+      _oscParameterReader.Dispose();
     }
 
     protected virtual void OnStateChanged()
@@ -514,6 +579,24 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed
         connectedOscClients = OSCReader.ConnectedOSCClients,
         oscClients = OSCReader.OSCClients,
         dataFeedErrorOSC = OSCReader.DataFeedErrorOSC
+      };
+    }
+
+    public object GetCurrentOSCParameterData()
+    {
+      _oscReader.UpdateOSCState();
+      ConfigureOSCParameterReader();
+
+      return new
+      {
+        oscEnabled = OSCReader.OSCEnabled,
+        oscRunning = OSCReader.OSCRunning,
+        currentAvatarId = CurrentAvatarId,
+        knownParameterCount = OSCParameterReader.KnownParameterCount,
+        recentMessageCount = OSCParameterReader.RecentMessageCount,
+        parameters = OSCParameterReader.Parameters,
+        recentMessages = OSCParameterReader.RecentMessages,
+        dataFeedErrorOSCParameters = OSCParameterReader.DataFeedErrorOSCParameters
       };
     }
   }

@@ -63,6 +63,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       wssv.AddWebSocketService("/api/v1/world", () => new DataFeedWorldWebSocketV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/realtime", () => new DataFeedRealTimeWebSocketV1(dataFeed));
       wssv.AddWebSocketService("/api/v1/osc", () => new DataFeedOSCWebSocketV1(dataFeed));
+      wssv.AddWebSocketService("/api/v1/osc-parameters", () => new DataFeedOSCParametersWebSocketV1(dataFeed));
 
       // Subscribe to the events using the broadcast methods of WebSocketServer
       dataFeed.InstanceChanged += (sender, args) =>

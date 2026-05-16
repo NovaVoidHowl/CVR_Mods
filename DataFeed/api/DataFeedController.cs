@@ -180,6 +180,27 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       return oscInfo;
     }
 
+    [Route(HttpVerbs.Get, "/osc-parameters")]
+    public object GetOSCParameterInfo()
+    {
+      GeneralHelper.DebugLog("Processing request for OSC parameter info.");
+
+      // Check for API Key in the request headers
+      var apiKey = Request.Headers[ApiConstants.ApiKeyHeader];
+      var configKey = _dataFeed.ApiConfig.ApiKey;
+
+      if (!ApiHelper.IsValidApiKey(apiKey, configKey))
+      {
+        return new { error = ApiConstants.ApiKeyInvalidError };
+      }
+
+      var oscParameterInfo = _dataFeed.GetCurrentOSCParameterData();
+
+      GeneralHelper.DebugLog("OSC parameter info retrieved successfully.");
+      Response.ContentType = ApiConstants.jsonContentType;
+      return oscParameterInfo;
+    }
+
     [Route(HttpVerbs.Get, "/")]
     public async Task GetApiV1()
     {
