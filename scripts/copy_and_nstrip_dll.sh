@@ -84,6 +84,8 @@ cp "$managed_data_path"/*.dll "$managed_libs_folder/"
 references_file="$repo_root/References.Items.props"
 ignore_names=(
     netstandard
+    mscorlib
+    System
     Mono.Cecil
     Unity.Burst.Cecil
     Microsoft.Win32.Registry

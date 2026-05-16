@@ -212,10 +212,6 @@
       <HintPath>$(MsBuildThisFileDirectory)/.ManagedLibs/MPUIKit.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>$(MsBuildThisFileDirectory)/.ManagedLibs/mscorlib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MTJobSystem">
       <HintPath>$(MsBuildThisFileDirectory)/.ManagedLibs/MTJobSystem.dll</HintPath>
       <Private>False</Private>
@@ -322,10 +318,6 @@
     </Reference>
     <Reference Include="System.Data">
       <HintPath>$(MsBuildThisFileDirectory)/.ManagedLibs/System.Data.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>$(MsBuildThisFileDirectory)/.ManagedLibs/System.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Drawing">

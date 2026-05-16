@@ -109,12 +109,22 @@ For DataFeed, the usual flow on either Windows or Linux is:
 make datafeed
 ```
 
+To build every mod in the repo:
+
+```shell
+make all-mods
+```
+
 Useful targets:
 
 - `make managed-libs` copies the required CVR and MelonLoader DLLs into `/.ManagedLibs` and runs NStrip.
 - `make managed-libs-no-strip` copies the DLLs without running NStrip.
 - `make build-datafeed` builds `DataFeed.dll` into your ChilloutVR `Mods` folder.
+- `make build-hrtocvr` builds `HRtoCVR.dll` into your ChilloutVR `Mods` folder.
+- `make build-thtocvr` builds `THtoCVR.dll` into your ChilloutVR `Mods` folder.
+- `make build-all` builds all mod DLLs into your ChilloutVR `Mods` folder.
 - `make datafeed` runs `managed-libs`, then `build-datafeed`.
+- `make all-mods` runs `managed-libs`, then builds all mod DLLs.
 
 In order to build the mods in this project on Windows:
 

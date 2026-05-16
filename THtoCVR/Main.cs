@@ -334,7 +334,7 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
       bool modified = false;
 
       // Auto-fix: Add trailing slash to BaseUrl if missing
-      if (!connection.BaseUrl.EndsWith('/'))
+      if (!connection.BaseUrl.EndsWith("/"))
       {
         MelonLogger.Warning($"Adding trailing slash to BaseUrl: {connection.BaseUrl}");
         connection.BaseUrl += "/";
@@ -342,14 +342,14 @@ namespace uk.novavoidhowl.dev.cvrmods.THtoCVR
       }
 
       // Auto-fix: Remove leading slash from endpoints if present
-      if (!string.IsNullOrEmpty(connection.TemperatureEndpoint) && connection.TemperatureEndpoint.StartsWith('/'))
+      if (!string.IsNullOrEmpty(connection.TemperatureEndpoint) && connection.TemperatureEndpoint.StartsWith("/"))
       {
         MelonLogger.Warning($"Removing leading slash from TemperatureEndpoint: {connection.TemperatureEndpoint}");
         connection.TemperatureEndpoint = connection.TemperatureEndpoint.TrimStart('/');
         modified = true;
       }
 
-      if (!string.IsNullOrEmpty(connection.HumidityEndpoint) && connection.HumidityEndpoint.StartsWith('/'))
+      if (!string.IsNullOrEmpty(connection.HumidityEndpoint) && connection.HumidityEndpoint.StartsWith("/"))
       {
         MelonLogger.Warning($"Removing leading slash from HumidityEndpoint: {connection.HumidityEndpoint}");
         connection.HumidityEndpoint = connection.HumidityEndpoint.TrimStart('/');
