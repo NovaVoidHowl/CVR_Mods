@@ -12,7 +12,4 @@
     <!-- Dependency for Unosquare.Swan.Lite -->
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Web" />
-  </ItemGroup>
 </Project>

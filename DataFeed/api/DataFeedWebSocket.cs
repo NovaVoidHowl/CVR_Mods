@@ -38,8 +38,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       if (string.IsNullOrEmpty(apiKey))
       {
         var uri = Context.RequestUri;
-        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-        apiKey = query["api-key"] ?? query["apikey"];
+        apiKey = GetQueryValue(uri, "api-key", "apikey");
       }
 
       var configKey = _dataFeed.ApiConfig.ApiKey;
@@ -51,6 +50,32 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
         return false;
       }
       return true;
+    }
+
+    private static string GetQueryValue(System.Uri uri, params string[] keys)
+    {
+      if (uri == null || string.IsNullOrEmpty(uri.Query))
+        return null;
+
+      var query = uri.Query.TrimStart('?');
+      foreach (var part in query.Split('&'))
+      {
+        if (string.IsNullOrEmpty(part))
+          continue;
+
+        var separatorIndex = part.IndexOf('=');
+        var rawKey = separatorIndex >= 0 ? part.Substring(0, separatorIndex) : part;
+        var rawValue = separatorIndex >= 0 ? part.Substring(separatorIndex + 1) : string.Empty;
+        var key = System.Net.WebUtility.UrlDecode(rawKey);
+
+        foreach (var expectedKey in keys)
+        {
+          if (string.Equals(key, expectedKey, System.StringComparison.OrdinalIgnoreCase))
+            return System.Net.WebUtility.UrlDecode(rawValue);
+        }
+      }
+
+      return null;
     }
 
     protected abstract string GetConnectionType();
