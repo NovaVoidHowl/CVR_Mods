@@ -12,6 +12,8 @@ On affected CVR builds, the native parser detects the arguments but tries to par
 integer. This mod patches `OSCServer.StartServer()` and applies valid parsed ports to `CheckVR.Instance` immediately
 before CVR starts its native OSC server.
 
+Upstream bug report: <https://github.com/ChilloutVR-Team/ChilloutVR-Issues/issues/2040>
+
 ## Behavior
 
 - Applies `--osc-listener-port=<port>` to CVR's native OSC listener port.
