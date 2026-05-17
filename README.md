@@ -93,6 +93,7 @@ feel free to leave bug reports or feature requests!
 | -------- | ------------------------------- | :---: | :----------------: | :------------------: | -------------------------------------------------------------------------------------- |
 | DataFeed | [README.md](DataFeed/README.md) | Ready |       0.9.5        |        0.8.0         | Exposes certain interface values as Avatar parameters and over REST and Websocket APIs |
 | HRtoCVR  | [README.md](HRtoCVR/README.md)  | Ready |       0.1.20       |        0.1.19        | Provides Heart Rate values as avatar animator parameters                               |
+| OSCLaunchArgsFix | [README.md](OSCLaunchArgsFix/README.md) | Ready | 0.1.0 | N/A | Fixes CVR native OSC `--osc-listener-port` and `--osc-sender-port` launch arguments. |
 | THtoCVR  | [README.md](THtoCVR/README.md)  | Ready |       0.1.1        |        0.0.4         | Temperature and/or humidity sensor info to avatar animator parameters.                 |
 
 ---
@@ -121,6 +122,7 @@ Useful targets:
 - `make managed-libs-no-strip` copies the DLLs without running NStrip.
 - `make build-datafeed` builds `DataFeed.dll` into your ChilloutVR `Mods` folder.
 - `make build-hrtocvr` builds `HRtoCVR.dll` into your ChilloutVR `Mods` folder.
+- `make build-osclaunchargsfix` builds `OSCLaunchArgsFix.dll` into your ChilloutVR `Mods` folder.
 - `make build-thtocvr` builds `THtoCVR.dll` into your ChilloutVR `Mods` folder.
 - `make build-all` builds all mod DLLs into your ChilloutVR `Mods` folder.
 - `make datafeed` runs `managed-libs`, then `build-datafeed`.

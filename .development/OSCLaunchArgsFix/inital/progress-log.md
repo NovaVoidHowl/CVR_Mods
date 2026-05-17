@@ -14,11 +14,23 @@
   - Do not add a config preference; the mod is single purpose.
   - Log when CVR appears to have already loaded valid OSC launch-argument ports, so users can report when the mod may
     no longer be needed.
+- Implemented the `OSCLaunchArgsFix` MelonLoader project.
+- Added a Harmony prefix on `OSCServer.StartServer()` that applies valid OSC listener/sender launch-argument ports
+  before CVR reads `CheckVR.Instance.oscListenerPort` and `oscSenderPort`.
+- Added defensive logging for missing args, invalid values, unavailable `CheckVR.Instance`, applied overrides, and
+  future CVR builds that already load valid values natively.
+- Added `OSCLaunchArgsFix` to the solution, Makefile restore/build/clean targets, `build-all`, and `all-mods`.
+- Added a mod README and root README entry.
+- Validated `make build-osclaunchargsfix-debug`.
+- Validated `make build-osclaunchargsfix-release`.
+- Validated `make build-all-release` includes `OSCLaunchArgsFix`.
+- Confirmed Debug emits `OSCLaunchArgsFix.pdb` and Release leaves only `OSCLaunchArgsFix.dll`.
 
 ## Current Status
 
-Planning complete. No code has been implemented yet.
+Implementation complete. Runtime validation in ChilloutVR is still pending.
 
 ## Next Step
 
-Create the `OSCLaunchArgsFix` MelonLoader project and implement the `OSCServer.StartServer()` Harmony prefix.
+Start ChilloutVR with `--osc-listener-port=9010 --osc-sender-port=9011`, enable native OSC, and confirm the player log
+shows the applied overrides before CVR starts OSC.

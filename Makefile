@@ -8,17 +8,19 @@ SETUP_MANAGED_LIBS_NO_STRIP = $(POWERSHELL) -NoProfile -ExecutionPolicy Bypass -
 BUILD_DATAFEED = $(POWERSHELL) -NoProfile -ExecutionPolicy Bypass -File scripts/build_mod.ps1 -ModName DataFeed -Configuration $(CONFIG)
 BUILD_HRTOCVR = $(POWERSHELL) -NoProfile -ExecutionPolicy Bypass -File scripts/build_mod.ps1 -ModName HRtoCVR -Configuration $(CONFIG)
 BUILD_THTOCVR = $(POWERSHELL) -NoProfile -ExecutionPolicy Bypass -File scripts/build_mod.ps1 -ModName THtoCVR -Configuration $(CONFIG)
+BUILD_OSCLAUNCHARGSFIX = $(POWERSHELL) -NoProfile -ExecutionPolicy Bypass -File scripts/build_mod.ps1 -ModName OSCLaunchArgsFix -Configuration $(CONFIG)
 else
 SETUP_MANAGED_LIBS = ./scripts/copy_and_nstrip_dll.sh --silent
 SETUP_MANAGED_LIBS_NO_STRIP = ./scripts/copy_and_nstrip_dll.sh --silent --skip-nstrip
 BUILD_DATAFEED = ./scripts/build_mod.sh DataFeed $(CONFIG)
 BUILD_HRTOCVR = ./scripts/build_mod.sh HRtoCVR $(CONFIG)
 BUILD_THTOCVR = ./scripts/build_mod.sh THtoCVR $(CONFIG)
+BUILD_OSCLAUNCHARGSFIX = ./scripts/build_mod.sh OSCLaunchArgsFix $(CONFIG)
 endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help managed-libs managed-libs-no-strip restore-datafeed restore-hrtocvr restore-thtocvr restore-all build-datafeed build-datafeed-debug build-datafeed-release build-hrtocvr build-hrtocvr-debug build-hrtocvr-release build-thtocvr build-thtocvr-debug build-thtocvr-release build-all build-all-debug build-all-release datafeed datafeed-debug datafeed-release hrtocvr hrtocvr-debug hrtocvr-release thtocvr thtocvr-debug thtocvr-release all-mods all-mods-debug all-mods-release clean-datafeed clean-hrtocvr clean-thtocvr clean-all
+.PHONY: help managed-libs managed-libs-no-strip restore-datafeed restore-hrtocvr restore-thtocvr restore-osclaunchargsfix restore-all build-datafeed build-datafeed-debug build-datafeed-release build-hrtocvr build-hrtocvr-debug build-hrtocvr-release build-thtocvr build-thtocvr-debug build-thtocvr-release build-osclaunchargsfix build-osclaunchargsfix-debug build-osclaunchargsfix-release build-all build-all-debug build-all-release datafeed datafeed-debug datafeed-release hrtocvr hrtocvr-debug hrtocvr-release thtocvr thtocvr-debug thtocvr-release osclaunchargsfix osclaunchargsfix-debug osclaunchargsfix-release all-mods all-mods-debug all-mods-release clean-datafeed clean-hrtocvr clean-thtocvr clean-osclaunchargsfix clean-all
 
 help:
 	@echo "CVR_Mods NVH build helper"
@@ -34,12 +36,14 @@ help:
 	@echo "  make restore-datafeed       Restore NuGet packages for DataFeed"
 	@echo "  make restore-hrtocvr        Restore NuGet packages for HRtoCVR"
 	@echo "  make restore-thtocvr        Restore NuGet packages for THtoCVR"
+	@echo "  make restore-osclaunchargsfix Restore NuGet packages for OSCLaunchArgsFix"
 	@echo "  make restore-all            Restore NuGet packages for all mods"
 	@echo ""
 	@echo "Build only:"
 	@echo "  make build-datafeed         Build DataFeed.dll into ChilloutVR/Mods"
 	@echo "  make build-hrtocvr          Build HRtoCVR.dll into ChilloutVR/Mods"
 	@echo "  make build-thtocvr          Build THtoCVR.dll into ChilloutVR/Mods"
+	@echo "  make build-osclaunchargsfix Build OSCLaunchArgsFix.dll into ChilloutVR/Mods"
 	@echo "  make build-all              Build all mod DLLs into ChilloutVR/Mods"
 	@echo "  make build-all-debug        Build all mod DLLs with CONFIG=Debug"
 	@echo "  make build-all-release      Build all mod DLLs with CONFIG=Release"
@@ -48,6 +52,7 @@ help:
 	@echo "  make datafeed               Run managed-libs, then build DataFeed"
 	@echo "  make hrtocvr                Run managed-libs, then build HRtoCVR"
 	@echo "  make thtocvr                Run managed-libs, then build THtoCVR"
+	@echo "  make osclaunchargsfix       Run managed-libs, then build OSCLaunchArgsFix"
 	@echo "  make all-mods               Run managed-libs, then build all mods"
 	@echo "  make all-mods-debug         Run managed-libs, then build all mods with CONFIG=Debug"
 	@echo "  make all-mods-release       Run managed-libs, then build all mods with CONFIG=Release"
@@ -56,6 +61,7 @@ help:
 	@echo "  make clean-datafeed         Run dotnet clean for DataFeed"
 	@echo "  make clean-hrtocvr          Run dotnet clean for HRtoCVR"
 	@echo "  make clean-thtocvr          Run dotnet clean for THtoCVR"
+	@echo "  make clean-osclaunchargsfix Run dotnet clean for OSCLaunchArgsFix"
 	@echo "  make clean-all              Run dotnet clean for all mods"
 	@echo ""
 	@echo "Environment:"
@@ -84,7 +90,10 @@ restore-hrtocvr:
 restore-thtocvr:
 	$(DOTNET) restore THtoCVR/THtoCVR.csproj
 
-restore-all: restore-datafeed restore-hrtocvr restore-thtocvr
+restore-osclaunchargsfix:
+	$(DOTNET) restore OSCLaunchArgsFix/OSCLaunchArgsFix.csproj
+
+restore-all: restore-datafeed restore-hrtocvr restore-thtocvr restore-osclaunchargsfix
 
 build-datafeed:
 	$(BUILD_DATAFEED)
@@ -113,10 +122,20 @@ build-thtocvr-debug:
 build-thtocvr-release:
 	$(MAKE) build-thtocvr CONFIG=Release
 
+build-osclaunchargsfix:
+	$(BUILD_OSCLAUNCHARGSFIX)
+
+build-osclaunchargsfix-debug:
+	$(MAKE) build-osclaunchargsfix CONFIG=Debug
+
+build-osclaunchargsfix-release:
+	$(MAKE) build-osclaunchargsfix CONFIG=Release
+
 build-all:
 	$(BUILD_DATAFEED)
 	$(BUILD_HRTOCVR)
 	$(BUILD_THTOCVR)
+	$(BUILD_OSCLAUNCHARGSFIX)
 
 build-all-debug:
 	$(MAKE) build-all CONFIG=Debug
@@ -154,11 +173,22 @@ thtocvr-debug:
 thtocvr-release:
 	$(MAKE) thtocvr CONFIG=Release
 
+osclaunchargsfix:
+	$(SETUP_MANAGED_LIBS)
+	$(BUILD_OSCLAUNCHARGSFIX)
+
+osclaunchargsfix-debug:
+	$(MAKE) osclaunchargsfix CONFIG=Debug
+
+osclaunchargsfix-release:
+	$(MAKE) osclaunchargsfix CONFIG=Release
+
 all-mods:
 	$(SETUP_MANAGED_LIBS)
 	$(BUILD_DATAFEED)
 	$(BUILD_HRTOCVR)
 	$(BUILD_THTOCVR)
+	$(BUILD_OSCLAUNCHARGSFIX)
 
 all-mods-debug:
 	$(MAKE) all-mods CONFIG=Debug
@@ -175,4 +205,7 @@ clean-hrtocvr:
 clean-thtocvr:
 	$(DOTNET) clean THtoCVR/THtoCVR.csproj -c $(CONFIG)
 
-clean-all: clean-datafeed clean-hrtocvr clean-thtocvr
+clean-osclaunchargsfix:
+	$(DOTNET) clean OSCLaunchArgsFix/OSCLaunchArgsFix.csproj -c $(CONFIG)
+
+clean-all: clean-datafeed clean-hrtocvr clean-thtocvr clean-osclaunchargsfix

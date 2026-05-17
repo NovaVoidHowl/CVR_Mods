@@ -1,0 +1,21 @@
+{
+  "_id": -1,
+  "name": "OSCLaunchArgsFix",
+  "modversion": "0.1.0",
+  "gameversion": "2026r181",
+  "loaderversion": "v0.7.0",
+  "modtype": "Mod",
+  "author": "NovaVoidHowl",
+  "description": "This mod fixes ChilloutVR native OSC launch arguments for custom listener and sender ports.",
+  "searchtags": [
+    "OSC",
+    "OSCQuery",
+    "launch arguments",
+    "port"
+  ],
+  "requirements": [],
+  "downloadlink": "https://github.com/NovaVoidHowl/CVR_Mods/releases/download/r7/OSCLaunchArgsFix.dll",
+  "sourcelink": "https://github.com/NovaVoidHowl/CVR_Mods/tree/main/OSCLaunchArgsFix",
+  "changelog": "Initial release. Fixes --osc-listener-port and --osc-sender-port launch argument handling.",
+  "embedcolor": "FFBC00"
+}
