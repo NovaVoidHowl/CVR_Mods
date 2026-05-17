@@ -1,0 +1,18 @@
+<Project>
+
+    <!-- Hack! MelonLoader is locking the Mod files, this way I can build and output the mod dll with the game running -->
+    <Target Name="DeleteOutputDLLIfExists" BeforeTargets="BeforeBuild">
+        <Delete Files="$(OutputPath)$(TargetName).dll" TreatErrorsAsWarnings="true" />
+    </Target>
+
+    <Target Name="DeleteReleasePDBBeforeBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Release'">
+        <Delete Files="$(OutputPath)$(TargetName).pdb" TreatErrorsAsWarnings="true" />
+        <Delete Files="$(TargetDir)$(TargetName).pdb" TreatErrorsAsWarnings="true" />
+    </Target>
+
+    <Target Name="DeleteReleasePDBAfterCopy" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
+        <Delete Files="$(OutputPath)$(TargetName).pdb" TreatErrorsAsWarnings="true" />
+        <Delete Files="$(TargetDir)$(TargetName).pdb" TreatErrorsAsWarnings="true" />
+    </Target>
+
+</Project>
