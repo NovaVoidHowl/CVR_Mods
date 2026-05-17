@@ -32,7 +32,19 @@ else {
 
 $outputPath = Join-Path -Path $cvrPath -ChildPath "Mods"
 
-dotnet build $projectPath `
-    -c $Configuration `
-    -p:OutputPath="$outputPath\" `
-    -p:SolutionDir="$repoRoot\"
+# MSBuild accepts forward slashes on Windows. Avoid quoted property values ending
+# in a backslash because native Windows argument parsing can merge the next arg.
+$msbuildOutputPath = ($outputPath -replace "\\", "/").TrimEnd("/") + "/"
+$msbuildSolutionDir = ($repoRoot -replace "\\", "/").TrimEnd("/") + "/"
+
+$buildArgs = @(
+    "build"
+    $projectPath
+    "-c"
+    $Configuration
+    "-p:OutputPath=$msbuildOutputPath"
+    "-p:SolutionDir=$msbuildSolutionDir"
+)
+
+dotnet @buildArgs
+exit $LASTEXITCODE
