@@ -136,7 +136,7 @@ In order to build the mods in this project on Windows:
 - (3) Run `make managed-libs` or `scripts/copy_and_nstrip_dll.ps1` on PowerShell. This will copy the required CVR, MelonLoader, and Mod DLLs into
   this project's `/.ManagedLibs`. Note if some of the required mods are not found, it will display the url from the CVR
   Modding Group API so you can download.
-- (4) Build the project with `make build-datafeed`, Visual Studio, or `dotnet build`.
+- (4) Build the project with `make build-datafeed`, `scripts/build_mod.ps1 -ModName DataFeed`, Visual Studio, or `dotnet build`.
 
 On Linux:
 
@@ -147,7 +147,7 @@ On Linux:
 - (3) Run `make managed-libs` or `./scripts/copy_and_nstrip_dll.sh`. This copies the same MelonLoader and CVR managed DLLs into `/.ManagedLibs` and
   regenerates `References.Items.props` with cross-platform paths.
 - (4) Build the mod:
-  `make build-datafeed` or `./scripts/build_datafeed.sh`
+  `make build-datafeed` or `./scripts/build_mod.sh DataFeed`
 
 ### Set CVR Folder Environment Variable
 
