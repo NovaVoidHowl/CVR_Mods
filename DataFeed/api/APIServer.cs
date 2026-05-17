@@ -6,6 +6,7 @@ using EmbedIO.Actions;
 using Newtonsoft.Json;
 using uk.novavoidhowl.dev.cvrmods.DataFeed.helpers;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
 {
@@ -54,7 +55,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
     private void InitializeServers()
     {
       // Setup WebSocket server
-      wssv = new WebSocketServer($"ws://localhost:{config.WebSocketPortInt}");
+      wssv = new WebSocketServer(IPAddress.Loopback, config.WebSocketPortInt);
       #region WebSocket API v1
       // Create factory methods for all websocket services instead of reusing instances
       wssv.AddWebSocketService("/api/v1/parameters", () => new DataFeedWebSocketParametersV1(dataFeed));
@@ -166,6 +167,7 @@ namespace uk.novavoidhowl.dev.cvrmods.DataFeed.api
       {
         GeneralHelper.DebugLog("[DEBUG] Starting servers...");
         wssv.Start();
+        MelonLoader.MelonLogger.Msg($"WebSocket API listening: ws://127.0.0.1:{config.WebSocketPortInt}/");
         GeneralHelper.DebugLog("[DEBUG] WebSocket server started");
 
         httpServer.Start();
